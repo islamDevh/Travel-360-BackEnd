@@ -8,21 +8,11 @@ use Illuminate\Http\Request;
 
 class BaseController extends Controller
 {
-    protected function respondSuccess($data = null, $message = 'Data retrieved successfully', $code = 200): JsonResponse
+    protected function respondSuccess($data = null, $message = 'Success', $code = 200): JsonResponse
     {
         return response()->json([
             'status' => $code,
             'message' => $message,
-            'data' => $data,
-        ], $code);
-    }
-
-    protected function respondSuccessWithToken($token, $data, $message = 'Success', $code = 200): JsonResponse
-    {
-        return response()->json([
-            'status' => $code,
-            'message' => $message,
-            'token' => $token,
             'data' => $data,
         ], $code);
     }
