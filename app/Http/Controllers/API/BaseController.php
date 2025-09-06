@@ -11,17 +11,19 @@ class BaseController extends Controller
     protected function respondSuccess($data = null, $message = 'Success', $code = 200): JsonResponse
     {
         return response()->json([
-            'status' => $code,
+            'status' => true,
             'message' => $message,
             'data' => $data,
         ], $code);
     }
 
 
+
+
     protected function respondError($errors = [], $message = 'Something went wrong', $code = 500): JsonResponse
     {
         return response()->json([
-            'status' => $code,
+            'status' => false,
             'message' => $message,
             'errors' => $errors ?: null,
         ], $code);
@@ -40,7 +42,7 @@ class BaseController extends Controller
     protected function respondForbidden($message = 'Forbidden'): JsonResponse
     {
         return response()->json([
-            'status' => 403,
+            'status' => false,
             'message' => $message,
         ], 403);
     }
@@ -53,7 +55,7 @@ class BaseController extends Controller
     protected function respondWithPagination($paginator, $message = 'Data retrieved successfully', $code = 200): JsonResponse
     {
         return response()->json([
-            'status' => $code,
+            'status' => true,
             'message' => $message,
             'data' => $paginator->items(),
             'pagination' => [
