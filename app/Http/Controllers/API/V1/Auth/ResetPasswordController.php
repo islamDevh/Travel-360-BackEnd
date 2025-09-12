@@ -3,58 +3,60 @@
 namespace App\Http\Controllers\API\V1\Auth;
 
 use App\Http\Controllers\API\BaseController;
-use App\Http\Controllers\Controller;
 use App\Models\User;
-use App\Services\API\EmailService;
+use App\Services\API\OTPService;
 use Illuminate\Http\Request;
 
 class ResetPasswordController extends BaseController
 {
-    public function __construct(protected EmailService $emailService) {}
-
-    public function send_otp_forgot_password(Request $request)
-    {
-        $request->validate(['email' => 'required|email']);
-
-        $user = User::where('email', $request->email)->first();
-        if (!$user) {
-            return $this->errorResponse(null, 'User not found');
-        }
-
-        $this->emailService->sendEmailOtp($user);
-        
-        return $this->successResponse(null, 'OTP sent successfully to your email');
-    }
-
-    public function reset_password_by_otp(Request $request)
+    public function __construct(protected OTPService $OTPService) {}
+    /**
+     * Handle forgot password: SMS/Email OTP
+     */
+    public function forgot_password(Request $request)
     {
         $request->validate([
-            'email' => 'required|email',
-            'otp' => 'required|string',
-            'new_password' => 'required|string|min:6|confirmed',
+            'registered_by' => 'required|in:email,phone',
+            'email' => 'nullable|string|required_if:registered_by,email',
+            'phone' => 'nullable|string|max:15|required_if:registered_by,phone',
         ]);
 
-        $user = User::where('email', $request->email)->first();
-        if (!$user) {
-            return $this->errorResponse(null, 'User not found');
+        if ($request->registered_by == 'email') {
+            $user = User::where('email', $request->email)->first();
+            if (!$user) {
+                return $this->notFoundResponse('User not found');
+            }
+            $status = $this->OTPService->send_email_otp($user);
+            if ($status['success']) {
+                return $this->successResponse(null, $status['message']);
+            }
+        } else {
+            $user = User::where('phone', $request->phone)->first();
+            if (!$user) {
+                return $this->notFoundResponse('User not found');
+            }
+            $status = $this->OTPService->send_SMS_OTP($user);
+            if ($status['success']) {
+                return $this->successResponse(null, $status['message']);
+            }
         }
 
-        // check otp is valid
-        $otpRecord = User::where('id', $user->id)
-            ->where('otp', $request->otp)
-            ->where('otp_expires_at', '>', now())
-            ->first();
+        return $this->errorResponse(null, $status['message']);
+    }
 
-        if (!$otpRecord) {
-            return $this->errorResponse(null, 'Invalid OTP or OTP has expired');
-        }
+    /**
+     * Handle reset password: verify OTP and reset password
+     */
 
-        $user->password = $request->new_password;
+    public function reset_password(Request $request)
+    {
+        $request->validate(['password' => 'required|string|min:6|confirmed']);
+
+        $user = auth()->user();
+        $user->password = $request->password;
         $user->otp = null;
         $user->otp_expires_at = null;
         $user->save();
-
-
-        return response()->json(['success' => true, 'message' => 'Password reset successfully']);
+        return $this->successResponse(null, 'Password reset successfully');
     }
 }

@@ -19,7 +19,7 @@ Route::prefix('v1')->group(function () {
         Route::post('resend_otp', [VerificationController::class, 'resend_otp']);
         Route::post('verify_otp', [VerificationController::class, 'verify_otp']);
 
-        Route::post('send_otp_forgot_password', [ResetPasswordController::class, 'send_otp_forgot_password']);
-        Route::post('reset_password_by_otp', [ResetPasswordController::class, 'reset_password_by_otp']);
+        Route::post('forgot_password', [ResetPasswordController::class, 'forgot_password']);
+        Route::post('reset_password', [ResetPasswordController::class, 'reset_password']);
     });
 });

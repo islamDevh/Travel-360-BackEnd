@@ -4,9 +4,7 @@
 namespace App\Services\API;
 
 use App\Mail\emails\EmailVerificationOTP;
-use App\Models\User;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Mail;
 
@@ -46,21 +44,6 @@ class OTPService
     public function verify_OTP($otpInput)
     {
         $user = auth()->user();
-        if ($user->registered_by == 'email' && $user->email_verified_at) { {
-                return [
-                    'success' => true,
-                    'message' => 'Email is already verified'
-                ];
-            }
-        }
-        if ($user->registered_by == 'phone' && $user->phone_verified_at) { {
-                return [
-                    'success' => true,
-                    'message' => 'phone is already verified'
-                ];
-            }
-        }
-
         $cacheKey = 'otp_attempts_' . $user->id;
         $attempts = Cache::get($cacheKey, 0);
 
