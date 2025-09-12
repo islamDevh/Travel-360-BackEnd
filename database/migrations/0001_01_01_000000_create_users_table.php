@@ -15,14 +15,17 @@ return new class extends Migration
             $table->id();
             $table->string('first_name');
             $table->string('last_name');
+            $table->enum('registered_by', ['email', 'phone']);
             $table->string('provider')->nullable();
             $table->string('provider_id')->nullable();
             $table->string('email')->unique()->nullable();
             $table->timestamp('email_verified_at')->nullable();
-            $table->string('password')->nullable();
             $table->string('phone', 20)->unique()->nullable();
+            $table->timestamp('phone_verified_at')->nullable();
             $table->string('otp', 4)->nullable();
             $table->timestamp('otp_expires_at')->nullable();
+            $table->string('fcm_token', 512)->nullable();
+            $table->string('password')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

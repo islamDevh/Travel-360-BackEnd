@@ -8,54 +8,47 @@ use Illuminate\Http\Request;
 
 class BaseController extends Controller
 {
-    protected function respondSuccess($data = null, $message = 'Success', $code = 200): JsonResponse
+    public function successResponse($data = null, $message = 'Success', $code = 200): JsonResponse
     {
         return response()->json([
-            'status' => true,
+            'success' => true,
+            'code' => $code,
             'message' => $message,
             'data' => $data,
         ], $code);
     }
 
-
-
-
-    protected function respondError($errors = [], $message = 'Something went wrong', $code = 500): JsonResponse
+    public function errorResponse($errors = [], $message = 'Something went wrong', $code = 500): JsonResponse
     {
         return response()->json([
-            'status' => false,
+            'success' => false,
+            'code' => $code,
             'message' => $message,
             'errors' => $errors ?: null,
         ], $code);
     }
 
-    protected function respondNotFound($message = 'Resource not found'): JsonResponse
+    public function notFoundResponse($message = 'Resource not found'): JsonResponse
     {
-        return $this->respondError([], $message, 404);
+        return $this->errorResponse([], $message, 404);
     }
 
-    protected function respondUnauthorized($message = 'Unauthorized'): JsonResponse
+    public function validationerrorResponse($errors, $message = 'Validation failed'): JsonResponse
     {
-        return $this->respondError($message, 401);
+        return $this->errorResponse($errors, $message, 422);
     }
 
-    protected function respondForbidden($message = 'Forbidden'): JsonResponse
+
+    public function unauthorizedResponse($message = 'Unauthorized'): JsonResponse
+    {
+        return $this->errorResponse([], $message, 401);
+    }
+
+    public function PaginationResponse($paginator, $message = 'Data retrieved successfully', $code = 200): JsonResponse
     {
         return response()->json([
-            'status' => false,
-            'message' => $message,
-        ], 403);
-    }
-
-    protected function respondValidationError($errors, $message = 'Validation failed'): JsonResponse
-    {
-        return $this->respondError($errors, $message, 422);
-    }
-
-    protected function respondWithPagination($paginator, $message = 'Data retrieved successfully', $code = 200): JsonResponse
-    {
-        return response()->json([
-            'status' => true,
+            'success' => true,
+            'code' => $code,
             'message' => $message,
             'data' => $paginator->items(),
             'pagination' => [
