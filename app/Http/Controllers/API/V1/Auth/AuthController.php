@@ -37,14 +37,14 @@ class AuthController extends BaseController
             if (!empty($validated['email'])) {
                 $status = $this->OTPService->send_email_otp($user);
                 if (!$status['success']) {
-                    return $this->errorResponse([],$status['message']);
+                    return $this->errorResponse([], $status['message']);
                 }
             }
             // send otp if phone is provided
             if (!empty($validated['phone'])) {
                 $status = $this->OTPService->send_SMS_OTP($user);
                 if (!$status['success']) {
-                    return $this->errorResponse([],$status['message']);
+                    return $this->errorResponse([], $status['message']);
                 }
             }
 
@@ -57,6 +57,7 @@ class AuthController extends BaseController
     public function login(LoginUserRequest $request)
     {
         $validated = $request->validated();
+
         $credentials = ['password' => $validated['password']];
         if (!empty($validated['email'])) {
             $credentials['email'] = $validated['email'];
@@ -67,11 +68,24 @@ class AuthController extends BaseController
         }
 
         if (!$token = JWTAuth::attempt($credentials)) {
-            return $this->unauthorizedResponse('Invalid credentials',);
+            return $this->unauthorizedResponse('Invalid credentials');
         }
 
         $user = auth()->user();
+
+        if ($user->registered_by === 'email' && !is_null($user->email_verified_at)) {
+            $is_verified = true;
+        }
+        if ($user->registered_by === 'phone' && !is_null($user->phone_verified_at)) {
+            $is_verified = true;
+        }
+
+        if (!$is_verified) {
+            return $this->errorResponse(['is_verified' => false], 'User is not verified', 401);
+        }
+
         $data = ['token' => $token, 'user' => $user];
+
         return $this->successResponse($data, 'User logged in successfully');
     }
 
@@ -95,5 +109,5 @@ class AuthController extends BaseController
     {
         return $this->successResponse(auth()->user());
     }
-    
 }
+

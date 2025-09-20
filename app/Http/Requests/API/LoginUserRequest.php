@@ -25,6 +25,8 @@ class LoginUserRequest extends FormRequest
             'email' => 'nullable|string|email',
             'phone' => 'nullable|string|max:15',
             'password' => 'required|string',
+            'fcm_token' => 'nullable|string',
+
         ];
     }
 }
