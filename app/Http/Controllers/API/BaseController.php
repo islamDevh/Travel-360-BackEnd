@@ -18,13 +18,13 @@ class BaseController extends Controller
         ], $code);
     }
 
-    public function errorResponse($errors = [], $message = 'Something went wrong', $code = 500): JsonResponse
+    public function errorResponse($data = [], $message = 'Something went wrong', $code = 500): JsonResponse
     {
         return response()->json([
             'success' => false,
             'code' => $code,
             'message' => $message,
-            'errors' => $errors ?: null,
+            'data' => $data ?: null,
         ], $code);
     }
 
@@ -33,9 +33,20 @@ class BaseController extends Controller
         return $this->errorResponse([], $message, 404);
     }
 
-    public function validationerrorResponse($errors, $message = 'Validation failed'): JsonResponse
+    public function validationErrorResponse(array $errors, $message = 'Validation failed', $code = 422): JsonResponse
     {
-        return $this->errorResponse($errors, $message, 422);
+        $formatted = [];
+
+        foreach ($errors as $field => $messages) {
+            $formatted[$field] = $messages[0];
+        }
+
+        return response()->json([
+            'success' => false,
+            'code' => $code,
+            'message' => $message,
+            'data' => $formatted,
+        ], $code);
     }
 
 

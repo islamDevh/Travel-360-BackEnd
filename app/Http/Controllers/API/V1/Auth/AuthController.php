@@ -22,11 +22,11 @@ class AuthController extends BaseController
             $validated = $request->validated();
             // check if either email or phone is not provided
             if (empty($validated['email']) && empty($validated['phone'])) {
-                return $this->validationerrorResponse('email or phone must be provided');
+                return $this->validationerrorResponse(['email or phone must be provided']);
             }
             // check if user register with email and phone
             if (!empty($validated['email']) && !empty($validated['phone'])) {
-                return $this->validationerrorResponse('cannot not registered with email and phone together');
+                return $this->validationerrorResponse(['only one of email or phone must be provided']);
             }
 
             // create user
@@ -64,7 +64,7 @@ class AuthController extends BaseController
         } elseif (!empty($validated['phone'])) {
             $credentials['phone'] = $validated['phone'];
         } else {
-            return $this->validationerrorResponse('Email or phone must be provided');
+            return $this->validationerrorResponse(['Email or phone must be provided']);
         }
 
         if (!$token = JWTAuth::attempt($credentials)) {
@@ -72,7 +72,7 @@ class AuthController extends BaseController
         }
 
         $user = auth()->user();
-
+        $is_verified = false;
         if ($user->registered_by === 'email' && !is_null($user->email_verified_at)) {
             $is_verified = true;
         }
@@ -81,7 +81,7 @@ class AuthController extends BaseController
         }
 
         if (!$is_verified) {
-            return $this->errorResponse(['is_verified' => false], 'User is not verified', 401);
+            return $this->errorResponse(['is_verified' => false,'user_id' => $user->id], 'User is not verified', 401);
         }
 
         $data = ['token' => $token, 'user' => $user];

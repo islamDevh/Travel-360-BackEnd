@@ -24,7 +24,6 @@ return new class extends Migration
             $table->timestamp('phone_verified_at')->nullable();
             $table->string('otp', 4)->nullable();
             $table->timestamp('otp_expires_at')->nullable();
-            $table->string('fcm_token', 512)->nullable();
             $table->string('password')->nullable();
             $table->rememberToken();
             $table->timestamps();
