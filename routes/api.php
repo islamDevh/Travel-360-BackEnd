@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\API\V1\Auth\AuthController;
 use App\Http\Controllers\API\V1\Auth\ResetPasswordController;
+use App\Http\Controllers\API\V1\Auth\SocialAuthController;
 use App\Http\Controllers\API\V1\Auth\VerificationController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -22,4 +23,7 @@ Route::prefix('v1')->group(function () {
         Route::post('reset_password', [ResetPasswordController::class, 'reset_password']);
     });
     Route::post('verify_otp', [VerificationController::class, 'verify_otp']);
+
+    Route::post('social_login', [SocialAuthController::class, 'social_login']);
+
 });

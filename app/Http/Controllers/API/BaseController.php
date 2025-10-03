@@ -18,7 +18,7 @@ class BaseController extends Controller
         ], $code);
     }
 
-    public function errorResponse($data = [], $message = 'Something went wrong', $code = 500): JsonResponse
+    public function errorResponse($data = [], $message = 'Something went wrong in the server', $code = 500): JsonResponse
     {
         return response()->json([
             'success' => false,

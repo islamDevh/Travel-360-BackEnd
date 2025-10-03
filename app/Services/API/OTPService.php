@@ -15,12 +15,12 @@ class OTPService
         $cacheKey = 'otp_send_limit_' . $user->id;
         $sendCount = Cache::get($cacheKey, 0);
 
-        // if ($sendCount >= 3) {
-        //     return [
-        //         'success' => false,
-        //         'message' => 'Too many OTP requests. Please try resend again later after 10 minutes.',
-        //     ];
-        // }
+        if ($sendCount >= 3) {
+            return [
+                'success' => false,
+                'message' => 'Too many OTP requests. Please try resend again later after 10 minutes.',
+            ];
+        }
 
         // generate OTP
         $otp = rand(1000, 9999);
