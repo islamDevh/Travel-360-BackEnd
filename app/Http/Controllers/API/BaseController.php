@@ -18,19 +18,18 @@ class BaseController extends Controller
         ], $code);
     }
 
-    public function errorResponse($data = [], $message = 'Something went wrong in the server', $code = 500): JsonResponse
+    public function errorResponse($message = 'Something went wrong in the server', $code = 500): JsonResponse
     {
         return response()->json([
             'success' => false,
             'code' => $code,
             'message' => $message,
-            'data' => $data ?: null,
         ], $code);
     }
 
     public function notFoundResponse($message = 'Resource not found'): JsonResponse
     {
-        return $this->errorResponse([], $message, 404);
+        return $this->errorResponse($message, 404);
     }
 
     public function validationErrorResponse(array $errors, $message = 'Validation failed', $code = 422): JsonResponse
@@ -52,7 +51,7 @@ class BaseController extends Controller
 
     public function unauthorizedResponse($message = 'Unauthorized'): JsonResponse
     {
-        return $this->errorResponse([], $message, 401);
+        return $this->errorResponse($message, 401);
     }
 
     public function PaginationResponse($paginator, $message = 'Data retrieved successfully', $code = 200): JsonResponse

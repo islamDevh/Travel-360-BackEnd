@@ -20,27 +20,27 @@ class ApiHandler extends BaseController
         if ($request->is('api/*') || $request->expectsJson()) {
 
             if ($e instanceof ModelNotFoundException) {
-                return $this->errorResponse([], 'Resource not found', 404);
+                return $this->errorResponse('Resource not found', 404);
             }
 
             if ($e instanceof NotFoundHttpException) {
-                return $this->errorResponse([], 'API not found', 404);
+                return $this->errorResponse('API not found', 404);
             }
 
             if ($e instanceof MethodNotAllowedHttpException) {
-                return $this->errorResponse([], 'Method not allowed', 405);
+                return $this->errorResponse('Method not allowed', 405);
             }
 
             if ($e instanceof AuthenticationException) {
-                return $this->errorResponse([], 'Unauthenticated', 401);
+                return $this->errorResponse('Unauthenticated', 401);
             }
 
             if ($e instanceof AuthorizationException) {
-                return $this->errorResponse([], 'Forbidden', 403);
+                return $this->errorResponse('Forbidden', 403);
             }
 
             if ($e instanceof ThrottleRequestsException) {
-                return $this->errorResponse([], 'Too many requests', 429);
+                return $this->errorResponse('Too many requests', 429);
             }
 
             if ($e instanceof ValidationException) {

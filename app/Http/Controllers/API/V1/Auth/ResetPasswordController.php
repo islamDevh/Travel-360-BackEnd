@@ -4,7 +4,7 @@ namespace App\Http\Controllers\API\V1\Auth;
 
 use App\Http\Controllers\API\BaseController;
 use App\Models\User;
-use App\Services\API\OTPService;
+use App\Services\OTPService;
 use Illuminate\Http\Request;
 
 class ResetPasswordController extends BaseController

@@ -23,6 +23,5 @@ Route::prefix('v1')->group(function () {
     });
     Route::post('verify_otp', [VerificationController::class, 'verify_otp']);
 
-    Route::post('social_login', [SocialAuthController::class, 'social_login']);
-
+    Route::post('social_login/{provider}', [SocialAuthController::class, 'social_login']);
 });

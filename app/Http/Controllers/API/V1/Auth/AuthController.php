@@ -7,8 +7,8 @@ use App\Http\Requests\API\LoginUserRequest;
 use App\Http\Requests\API\RegisterUserRequest;
 use App\Http\Requests\API\UpdateUserRequest;
 use App\Models\User;
-use App\Services\API\OTPService;
-use App\Services\API\OTP;
+use App\Services\OTPService;
+use App\Services\OTP;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Tymon\JWTAuth\Facades\JWTAuth;
@@ -38,14 +38,15 @@ class AuthController extends BaseController
             if (!empty($validated['email'])) {
                 $status = $this->OTPService->send_email_otp($user);
                 if (!$status['success']) {
-                    return $this->errorResponse([], $status['message']);
+                    return $this->errorResponse( $status['message']);
                 }
             }
+            
             // send otp if phone is provided
             if (!empty($validated['phone'])) {
                 $status = $this->OTPService->send_SMS_OTP($user);
                 if (!$status['success']) {
-                    return $this->errorResponse([], $status['message']);
+                    return $this->errorResponse( $status['message']);
                 }
             }
 
@@ -131,7 +132,7 @@ class AuthController extends BaseController
                 // Send OTP for new email
                 $status = $this->OTPService->send_email_otp($user);
                 if (!$status['success']) {
-                    return $this->errorResponse([], $status['message']);
+                    return $this->errorResponse( $status['message']);
                 }
 
                 unset($validated['email']);
@@ -147,7 +148,7 @@ class AuthController extends BaseController
                 // Send OTP for new phone
                 $status = $this->OTPService->send_SMS_OTP($user);
                 if (!$status['success']) {
-                    return $this->errorResponse([], $status['message']);
+                    return $this->errorResponse( $status['message']);
                 }
 
                 unset($validated['phone']);

@@ -1,7 +1,7 @@
 <?php
 
 
-namespace App\Services\API;
+namespace App\Services;
 
 use App\Mail\emails\EmailVerificationOTP;
 use Carbon\Carbon;

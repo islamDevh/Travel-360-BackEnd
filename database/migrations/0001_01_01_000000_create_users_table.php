@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('first_name');
             $table->string('last_name');
-            $table->enum('registered_by', ['email', 'phone']);
+            $table->enum('registered_by', ['email', 'phone',]);
             $table->string('provider')->nullable();
             $table->string('provider_id')->nullable();
             $table->string('email')->unique()->nullable();

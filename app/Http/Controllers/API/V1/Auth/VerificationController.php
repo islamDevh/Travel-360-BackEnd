@@ -5,7 +5,7 @@ namespace App\Http\Controllers\API\V1\Auth;
 use App\Http\Controllers\API\BaseController;
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use App\Services\API\OTPService;
+use App\Services\OTPService;
 use Illuminate\Http\Request;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
@@ -23,6 +23,7 @@ class VerificationController extends BaseController
                 return $this->successResponse([], $status['message']);
             }
         }
+
         if ($user->registered_by == 'phone') {
             $status = $this->OTPService->send_SMS_OTP($user);
             if (!$status['success']) {
@@ -30,7 +31,7 @@ class VerificationController extends BaseController
             }
         }
 
-        return $this->errorResponse([], $status['message'], 401);
+        return $this->errorResponse($status['message'], 401);
     }
 
     public function verify_otp(Request $request)
@@ -42,12 +43,10 @@ class VerificationController extends BaseController
         $result = $this->OTPService->verify_OTP($request->otp, $data['user']);
 
         if ($result['success']) {
-            // Generate real token after verification
             $data['token'] = JWTAuth::fromUser($data['user']);
-
             return $this->successResponse($data, $result['message']);
         }
 
-        return $this->errorResponse([], $result['message']);
+        return $this->errorResponse($result['message']);
     }
 }
