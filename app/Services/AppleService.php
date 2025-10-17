@@ -22,7 +22,7 @@ class AppleService
 
         $response = Http::get('https://appleid.apple.com/auth/keys');
 
-        dd($response->json());
+
         
         $keys = $response->json()['keys'];
 

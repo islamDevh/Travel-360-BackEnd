@@ -11,7 +11,7 @@ class GoogleService
         $response = Http::get('https://www.googleapis.com/oauth2/v3/userinfo', [
             'access_token' => $token,
         ])->json();
-        dd($response);
+
         return [
             'id'     => $response['sub'] ?? null,
             'name'   => $response['name'] ?? null,
