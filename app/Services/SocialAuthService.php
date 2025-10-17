@@ -7,21 +7,24 @@ use Illuminate\Support\Str;
 
 class SocialAuthService
 {
-    protected $providers;
-
-    public function __construct($providers)
-    {
-        $this->providers = $providers;
-    }
+    public function __construct(
+        protected GoogleService $GoogleService,
+        protected AppleService $AppleService,
+        protected FacebookService $FacebookService
+    ) {}
 
     public function fetchUserFromProvider($provider, $token)
     {
-        if (!isset($this->providers[$provider])) {
-            throw new \Exception('Provider ' . $provider . ' is not supported.');
+        switch ($provider) {
+            case 'google':
+                return $this->GoogleService->fetchUser($token);
+            case 'apple':
+                return $this->AppleService->fetchUser($token);
+            case 'facebook':
+                return $this->FacebookService->fetchUser($token);
+            default:
+                throw new \Exception('Invalid provider');
         }
-        
-        $service = $this->providers[$provider];
-        return $service->fetchUser($token);
     }
 
     public function firstOrCreateUser($socialUser, $provider)

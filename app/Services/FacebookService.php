@@ -12,7 +12,7 @@ class FacebookService
             'fields'       => 'id,name,email,picture',
             'access_token' => $token,
         ])->json();
-
+            dd($response);
         return [
             'id'     => $response['id'] ?? null,
             'name'   => $response['name'] ?? null,
