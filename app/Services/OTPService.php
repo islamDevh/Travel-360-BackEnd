@@ -41,7 +41,7 @@ class OTPService
 
 
 
-    public function verify_OTP($otpInput, $user)
+    public function verify_OTP($otp, $user)
     {
         $cacheKey = 'otp_attempts_' . $user->id;
         $attempts = Cache::get($cacheKey, 0);
@@ -60,7 +60,7 @@ class OTPService
             ];
         }
 
-        if (trim($otpInput) !== (string)$user->otp) {
+        if (trim($otp) !== (string)$user->otp) {
             Cache::put($cacheKey, $attempts + 1, now()->addMinutes(10));
 
             return [
@@ -73,10 +73,7 @@ class OTPService
         if ($user->registered_by === 'email') {
             $user->email_verified_at = now();
         }
-        if ($user->registered_by === 'phone') {
-            $user->phone_verified_at = now();
-        }
-
+        
         // reset OTP
         $user->otp = null;
         $user->otp_expires_at = null;

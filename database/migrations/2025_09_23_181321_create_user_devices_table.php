@@ -14,9 +14,9 @@ return new class extends Migration
         Schema::create('user_devices', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id');
-            $table->string('device_id');
-            $table->string('fcm_token', 512);
-            $table->string('device_type')->nullable(); // e.g., 'android', '
+            $table->string('device_token', 512);
+            $table->string('device_id', 512);
+            $table->string('device_type')->nullable();
             $table->timestamps();
         });
     }

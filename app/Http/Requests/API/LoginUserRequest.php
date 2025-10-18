@@ -22,11 +22,11 @@ class LoginUserRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => 'nullable|string|email',
-            'phone' => 'nullable|string|max:15',
-            'password' => 'required|string',
-            'fcm_token' => 'nullable|string',
-
+            'email'       => 'required|string|email',
+            'password'    => 'required|string',
+            'fcm_token'   => 'required|string',
+            'device_id'   => 'required|string',
+            'device_type' => 'required|string|in:android,ios',
         ];
     }
 }
