@@ -17,6 +17,7 @@ use PHPOpenSourceSaver\JWTAuth\Exceptions\TokenExpiredException;
 use PHPOpenSourceSaver\JWTAuth\Exceptions\TokenInvalidException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 
 class ApiHandler extends BaseController
 {
@@ -27,24 +28,44 @@ class ApiHandler extends BaseController
             if ($e instanceof ModelNotFoundException) return $this->errorResponse('Resource not found', 404);
             if ($e instanceof NotFoundHttpException) return $this->errorResponse('API not found', 404);
             if ($e instanceof MethodNotAllowedHttpException) return $this->errorResponse('Method not allowed', 405);
-            if ($e instanceof AuthenticationException) return $this->errorResponse('Unauthenticated', 401);
+
+            // JWT/Auth - يجب فحصها قبل AuthenticationException
+            if ($e instanceof TokenExpiredException) return $this->errorResponse('Token expired', 401);
+            if ($e instanceof TokenInvalidException) return $this->errorResponse('Token invalid', 401);
+            if ($e instanceof JWTException) return $this->errorResponse('Token not provided or invalid', 401);
+
+            // فحص التوكن يدوياً عند حدوث AuthenticationException
+            if ($e instanceof AuthenticationException) {
+                try {
+                    $token = JWTAuth::parseToken();
+
+                    // محاولة فحص التوكن
+                    $token->authenticate();
+
+                    // إذا وصلنا هنا، التوكن صالح لكن المستخدم غير مصرح له
+                    return $this->errorResponse('Unauthenticated', 401);
+                } catch (TokenExpiredException $ex) {
+                    return $this->errorResponse('Token expired', 401);
+                } catch (TokenInvalidException $ex) {
+                    return $this->errorResponse('Token invalid', 401);
+                } catch (JWTException $ex) {
+                    return $this->errorResponse('Token not provided', 401);
+                } catch (\Exception $ex) {
+                    return $this->errorResponse('Unauthenticated', 401);
+                }
+            }
+
             if ($e instanceof AuthorizationException) return $this->errorResponse('Forbidden', 403);
             if ($e instanceof ThrottleRequestsException) return $this->errorResponse('Too many requests', 429);
             if ($e instanceof ValidationException) return $this->validationerrorResponse($e->errors(), 'Validation failed');
             if ($e instanceof MissingAttributeException) return $this->errorResponse($e->getMessage(), 400);
 
-            // JWT/Auth
-            if ($e instanceof TokenExpiredException) return $this->errorResponse('Token expired', 401);
-            if ($e instanceof TokenInvalidException) return $this->errorResponse('Token invalid', 401);
-            if ($e instanceof JWTException) return $this->errorResponse('Token not provided or invalid', 401);
-
-            // Database & Query
+            // Database & Query 
             if ($e instanceof QueryException) return $this->errorResponse('Database query error', 500);
 
-              // PHP/Method errors
+            // PHP/Method errors 
             if ($e instanceof \BadMethodCallException) return $this->errorResponse('Bad method call: ' . $e->getMessage(), 400);
             if ($e instanceof \ErrorException) return $this->errorResponse($e->getMessage(), 400);
-
 
             return $this->errorResponse(config('app.debug') ? $e->getMessage() : 'Server error', 500);
         }

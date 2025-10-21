@@ -18,26 +18,24 @@ class OTPService
         if ($sendCount >= 3) {
             return [
                 'success' => false,
-                'message' => 'Too many OTP requests. Please try resend again later after 10 minutes.',
+                'message' => 'Too many OTP requests. Please try resend again later after 3 minutes.',
             ];
         }
 
         // generate OTP
         $otp = rand(1000, 9999);
         $user->otp = $otp;
-        $user->otp_expires_at = Carbon::now()->addMinutes(10);
+        $user->otp_expires_at = Carbon::now()->addMinutes(3);
         $user->save();
 
         Mail::to($user->email)->send(new EmailVerificationOTP($otp));
 
         // increment counter with expiry
-        Cache::put($cacheKey, $sendCount + 1, now()->addMinutes(10));
-
-        return [
-            'success' => true,
-            'message' => 'OTP sent successfully'
-        ];
+        Cache::put($cacheKey, $sendCount + 1, now()->addMinutes(3));
+        return ['success' => true];
     }
+
+    
 
 
 
@@ -61,7 +59,7 @@ class OTPService
         }
 
         if (trim($otp) !== (string)$user->otp) {
-            Cache::put($cacheKey, $attempts + 1, now()->addMinutes(10));
+            Cache::put($cacheKey, $attempts + 1, now()->addMinutes(3));
 
             return [
                 'success' => false,
@@ -73,7 +71,7 @@ class OTPService
         if ($user->registered_by === 'email') {
             $user->email_verified_at = now();
         }
-        
+
         // reset OTP
         $user->otp = null;
         $user->otp_expires_at = null;

@@ -29,6 +29,9 @@ class RegisterUserRequest extends FormRequest
             'email'         => 'nullable|string|email|unique:users,email',
             'phone'         => 'required|string|max:15|unique:users,phone',
             'password'      => 'required|string|confirmed|min:8',
+            'fcm_token'     => 'required|string',
+            'device_id'     => 'required|string',
+            'device_type'   => 'required|string|in:android,ios',
         ];
     }
 }

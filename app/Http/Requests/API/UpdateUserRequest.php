@@ -22,7 +22,7 @@ class UpdateUserRequest extends FormRequest
             'email'      => ['sometimes', 'email', 'max:255', Rule::unique('users')->ignore($user_id)],
             'phone'      => ['sometimes', 'string', 'max:20', Rule::unique('users')->ignore($user_id)],
             'gender'     => 'sometimes|in:male,female',
-            'avatar'     => 'sometimes|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'avatar'     => 'sometimes|image|mimes:jpeg,png,jpg,gif|max:8192',
         ];
     }
 }
