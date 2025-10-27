@@ -6,6 +6,7 @@ use App\Http\Controllers\API\BaseController;
 use App\Http\Requests\API\LoginUserRequest;
 use App\Http\Requests\API\RegisterUserRequest;
 use App\Http\Requests\API\UpdateUserRequest;
+use App\Http\Resources\UserResource;
 use App\Services\AuthService;
 use Illuminate\Http\Request;
 use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
@@ -36,8 +37,13 @@ class AuthController extends BaseController
         if (!$result['success']) {
             return $this->errorResponse($result['message']);
         }
+        $userData = [
+            'token' => $result['data']['token'],
+            'user'  => new UserResource($result['data']['user']),
+        ];
 
-        return $this->successResponse($result['data'], $result['message']);
+
+        return $this->successResponse($userData, $result['message']);
     }
 
     public function logout()
@@ -56,7 +62,7 @@ class AuthController extends BaseController
 
     public function me()
     {
-        return $this->successResponse(auth()->user());
+        return $this->successResponse(new UserResource(auth()->user()));
     }
 
     public function update_profile(UpdateUserRequest $request)
@@ -66,8 +72,10 @@ class AuthController extends BaseController
         if (!$result['success']) {
             return $this->errorResponse(null, $result['message'], $result['status']);
         }
-
-        return $this->successResponse($result['data'], $result['message']);
+        $userData = [
+            'user'  => new UserResource($result['data']['user']),
+        ];
+        return $this->successResponse($userData, $result['message']);
     }
 
     public function change_password(Request $request)

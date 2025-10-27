@@ -46,7 +46,7 @@ class AppleService
             'id' => $decoded->sub,
             'email' => $decoded->email ?? null,
             'name' => null, // Apple doesn't provide name in token, must be sent separately by client
-            'avatar' => null,
+            'image' => null,
         ];
     }
 }

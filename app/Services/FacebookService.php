@@ -17,7 +17,7 @@ class FacebookService
             'id'     => $response['id'] ?? null,
             'name'   => $response['name'] ?? null,
             'email'  => $response['email'] ?? null,
-            'avatar' => $response['picture']['data']['url'] ?? null,
+            'image' => $response['picture']['data']['url'] ?? null,
         ];
     }
 }

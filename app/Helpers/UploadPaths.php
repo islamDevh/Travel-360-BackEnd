@@ -1,14 +1,14 @@
 <?php
 
 /**
- * Paths Helper
+ * paths Helper
  */
-const STORAGE_PATH        = "app/public/";                    
-const STORAGE_PUBLIC_PATH = "storage/app/public/"; 
+const storagePath           = "app/public/";
+const storageFromPublicPath = "storage/";
 
 /**
  * user module paths
  */
-const PROGRAM_STORAGE_PATH = STORAGE_PATH . 'programs/';
-const PROGRAM_PUBLIC_PATH  = STORAGE_PUBLIC_PATH . 'programs/';
+const userStoragePath = "users/";
+const userImagePathFromPublic   = storageFromPublicPath . userStoragePath;
 

@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('first_name');
             $table->string('last_name');
             $table->enum('gender', ['male', 'female'])->nullable();
-            $table->string('avatar')->nullable();
+            $table->string('image')->nullable();
             $table->enum('registered_by', ['email', 'phone',]);
             $table->string('provider')->nullable();
             $table->string('provider_id')->nullable();

@@ -7,22 +7,24 @@ use Illuminate\Support\Facades\File;
 trait UploadFiles
 {
 
-    protected function uploadFile($file, $path)
-    {        
-        return $file->store($path, 'public');
+    protected function uploadFile($newFile, $path)
+    {
+        $file_name = uuid_create() . "." . $newFile->getClientOriginalExtension();
+        $filePath  = $newFile->storeAs($path, $file_name, 'public');
+        return $file_name;
     }
 
     protected function removeFile($path)
     {
-        if (isset($path) && File::exists(storage_path(STORAGE_PATH . $path))) {
-            File::delete(storage_path(STORAGE_PATH . $path));
+        if (File::exists(storage_path(storagePath . $path))) {
+            File::delete(storage_path(storagePath . $path));
         }
     }
 
     protected function getFile($path)
     {
-        if (isset($path) && File::exists(storage_path(STORAGE_PATH . $path))) {
-            return File::get(storage_path(STORAGE_PATH . $path));
+        if (File::exists(storage_path(storagePath . $path))) {
+            return File::get(storage_path(storagePath . $path));
         }
         return null;
     }

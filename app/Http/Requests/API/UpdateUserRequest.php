@@ -17,12 +17,12 @@ class UpdateUserRequest extends FormRequest
         $user_id = auth()->id();
 
         return [
-            'first_name' => 'sometimes|string|max:255',
-            'last_name'  => 'sometimes|string|max:255',
-            'email'      => ['sometimes', 'email', 'max:255', Rule::unique('users')->ignore($user_id)],
-            'phone'      => ['sometimes', 'string', 'max:20', Rule::unique('users')->ignore($user_id)],
-            'gender'     => 'sometimes|in:male,female',
-            'avatar'     => 'sometimes|image|mimes:jpeg,png,jpg,gif|max:8192',
+            'first_name' => 'nullable|string|max:255',
+            'last_name'  => 'nullable|string|max:255',
+            'email'      => ['nullable', 'email', 'max:255', Rule::unique('users')->ignore($user_id)],
+            'phone'      => ['nullable', 'string', 'max:20', Rule::unique('users')->ignore($user_id)],
+            'gender'     => 'nullable|in:male,female',
+            'image'      => 'nullable|image|mimes:jpeg,png,jpg,gif|max:8192',
         ];
     }
 }

@@ -16,7 +16,7 @@ class GoogleService
             'id'     => $response['sub'] ?? null,
             'name'   => $response['name'] ?? null,
             'email'  => $response['email'] ?? null,
-            'avatar' => $response['picture'] ?? null,
+            'image' => $response['picture'] ?? null,
         ];
     }
 }

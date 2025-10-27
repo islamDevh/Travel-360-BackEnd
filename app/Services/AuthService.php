@@ -6,11 +6,13 @@ use App\Models\User;
 use App\Models\UserDevice;
 use Illuminate\Support\Facades\Hash;
 use App\Services\OTPService;
+use App\Traits\UploadFiles;
 use Illuminate\Support\Facades\DB;
 use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 
 class AuthService
 {
+    use UploadFiles;
     public function __construct(protected OTPService $OTPService) {}
 
     public function register(array $validated)
@@ -96,11 +98,9 @@ class AuthService
                 'device_type' => $validated['device_type'],
             ]);
         }
-
         // Check verification
-        $is_verified = $user->registered_by === 'email'
-            ? !is_null($user->email_verified_at)
-            : !is_null($user->phone_verified_at);
+        // $is_verified = $user->registered_by === 'email' ? !is_null($user->email_verified_at) : !is_null($user->phone_verified_at);
+        $is_verified = $user->email_verified_at ? true : false;
 
         if (!$is_verified) {
             return [
@@ -110,9 +110,11 @@ class AuthService
             ];
         }
 
-        $data = ['token' => $token, 'user' => $user];
-
-        return ['success' => true, 'data'    => $data, 'message' => 'User logged in successfully'];
+        return [
+            'success' => true,
+            'message' => 'User logged in successfully',
+            'data'    => ['token' => $token, 'user' => $user],
+        ];
     }
 
 
@@ -121,59 +123,82 @@ class AuthService
         try {
             $needsVerification = false;
 
-            // Handle email update with verification
+            // --- EMAIL UPDATE (with verification) ---
             if (isset($validated['email']) && $validated['email'] !== $user->email) {
-                $user->email             = $validated['email'];
+                $newEmail = $validated['email'];
+
+                // assign it before sending OTP
+                $user->email             = $newEmail;
                 $user->email_verified_at = null;
 
                 $status = $this->OTPService->send_email_otp($user);
                 if (!$status['success']) {
-                    return ['success' => false, 'message' => $status['message']];
+                    return [
+                        'success' => false,
+                        'message' => $status['message'],
+                    ];
                 }
 
+                // prevent update() from overwriting this logic again
                 unset($validated['email']);
                 $needsVerification = true;
             }
 
-            // Handle phone update with verification
+            // --- PHONE UPDATE (with verification) ---
             if (isset($validated['phone']) && $validated['phone'] !== $user->phone) {
-                $user->phone             = $validated['phone'];
+                $newPhone = $validated['phone'];
+
+                $user->phone             = $newPhone;
                 $user->phone_verified_at = null;
                 $user->registered_by     = 'phone';
 
                 $status = $this->OTPService->send_SMS_OTP($user);
                 if (!$status['success']) {
-                    return ['success' => false, 'message' => $status['message']];
+                    return [
+                        'success' => false,
+                        'message' => $status['message'],
+                    ];
                 }
 
                 unset($validated['phone']);
+                // uncomment if you want phone changes to also trigger verification notice
                 // $needsVerification = true;
             }
 
-            $user->first_name = $validated['first_name'] ?? $user->first_name;
-            $user->last_name  = $validated['last_name']  ?? $user->last_name;
-            
-            $user->fill($validated);
-
-            // update only if there are changes
-            if ($user->isDirty()) {
-                $user->save();
+            // --- PASSWORD UPDATE (hash before saving) ---
+            if (!empty($validated['password'])) {
+                $validated['password'] = $validated['password'];
             }
+            // update image if provided
+            if (isset($validated['image'])) {
+                // remove old image
+                $this->removeFile(userStoragePath . $user->image);
+
+                // upload new image
+                $image_name         = $this->uploadFile($validated['image'], userStoragePath);
+                $validated['image'] = $image_name;
+            }
+
+            $user->update($validated);
 
             return [
                 'success' => true,
-                'data'    => [
-                    'user'               => $user->fresh(),
-                    'needs_verification' => $needsVerification
+                'data' => [
+                    'user' => $user->fresh(),
+                    'needs_verification' => $needsVerification,
                 ],
                 'message' => $needsVerification
-                    ? 'Profile updated successfully. Please verify your new contact information'
-                    :  'Profile updated successfully'
+                    ? 'Profile updated successfully. Please verify your new contact information.'
+                    : 'Profile updated successfully.',
             ];
         } catch (\Exception $e) {
-            return ['success' => false, 'message' => 'Update failed: ' . $e->getMessage()];
+            return [
+                'success' => false,
+                'message' => 'Profile update failed: ' . $e->getMessage(),
+            ];
         }
     }
+
 
 
 

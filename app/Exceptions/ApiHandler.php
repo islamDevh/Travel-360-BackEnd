@@ -29,20 +29,18 @@ class ApiHandler extends BaseController
             if ($e instanceof NotFoundHttpException) return $this->errorResponse('API not found', 404);
             if ($e instanceof MethodNotAllowedHttpException) return $this->errorResponse('Method not allowed', 405);
 
-            // JWT/Auth - يجب فحصها قبل AuthenticationException
             if ($e instanceof TokenExpiredException) return $this->errorResponse('Token expired', 401);
             if ($e instanceof TokenInvalidException) return $this->errorResponse('Token invalid', 401);
             if ($e instanceof JWTException) return $this->errorResponse('Token not provided or invalid', 401);
+            if ($e instanceof \Error) return $this->errorResponse($e->getMessage(), 500);
+            if ($e instanceof \TypeError) return $this->errorResponse($e->getMessage(), 500);
 
-            // فحص التوكن يدوياً عند حدوث AuthenticationException
             if ($e instanceof AuthenticationException) {
                 try {
                     $token = JWTAuth::parseToken();
 
-                    // محاولة فحص التوكن
                     $token->authenticate();
 
-                    // إذا وصلنا هنا، التوكن صالح لكن المستخدم غير مصرح له
                     return $this->errorResponse('Unauthenticated', 401);
                 } catch (TokenExpiredException $ex) {
                     return $this->errorResponse('Token expired', 401);
