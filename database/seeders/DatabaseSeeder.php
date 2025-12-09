@@ -20,5 +20,8 @@ class DatabaseSeeder extends Seeder
             'last_name' => 'ahmed',
             'email'      => 'test@example.com',
         ]);
+        $this->call([
+            AdminSeeder::class,
+        ]);
     }
 }
