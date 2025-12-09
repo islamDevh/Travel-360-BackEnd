@@ -32,7 +32,7 @@ Route::prefix('v1')->group(function () {
      */
     Route::prefix('payment')->group(function () {
         Route::post('create', [PaymentController::class, 'createPayment'])->middleware('auth:api')->name('payment.create');
-        Route::post('payment-callback', [PaymentController::class, 'paymentCallback'])->name('payment.callback');
+        Route::any('callback', [PaymentController::class, 'paymentCallback'])->name('payment.callback');
         Route::get('payment-return', [PaymentController::class, 'paymentReturn'])->name('payment.return');
     });
 });

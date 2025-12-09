@@ -18,8 +18,8 @@ class PaymentController extends BaseController
     {
         try {
             // receive order data from the request
-            $order_id    = $request->input('order_id');
-            $description = $request->input('description');
+            $order_id    = "Order_101";
+            $description = "Umra Service";
             $amount      = $request->input('amount');
             $name        = $request->input('name');
             $email       = $request->input('email');
@@ -32,14 +32,16 @@ class PaymentController extends BaseController
             $returnUrl   = $request->input('return_url');
             $callbackUrl = $request->input('callback_url');
 
-            $pay = paypage::sendPaymentCode('all') //required
+            $pay = paypage::sendPaymentCode("creditcard, mada, stcpay, applepay, tamara, tabby") // required
                 ->sendTransaction('sale', 'ecom')
+                ->sendCustomerDetails($name, $email, $phone, $city, $city, $state, $country, null, null)
                 ->sendCart("Order_101", 1000.00, 'Order Description')
+                ->sendHideShipping(true)
                 ->sendURLs(
-                    "https://webhook.site/7e607f57-f113-41ac-a181-5fd65ff08e32",
-                    "https://webhook.site/7e607f57-f113-41ac-a181-5fd65ff08e32"
+                    "http://localhost:8000/api/v1/payment/callback",
+                    "http://localhost:8000/api/v1/payment/callback"
                 )
-                ->create_pay_page();
+                ->create_pay_page(null, null, null, null, null, null, null);
 
             return $pay;
         } catch (\Exception $e) {
@@ -52,18 +54,19 @@ class PaymentController extends BaseController
      */
     public function paymentCallback(Request $request)
     {
-        Log::channel('PayTabs')->info('Payment Callback Data: ', $request->all());
+
+        $payload = $request->getContent();
+
+        Log::channel('PayTabs')->info('Callback RAW: ' . $request->getContent());
+        Log::channel('PayTabs')->info('Callback ARRAY: ' . json_encode($request->all()));
 
         $tranRef = $request->input('tran_ref');
         $cartId  = $request->input('cart_id');
         $status  = $request->input('resp_status');
 
-        // TODO: Update order status in your database
-        // Example:
-        // Order::where('id', $cartId)->update(['status' => $status]);
-
-        return response()->json(['message' => 'Callback received']);
+        return response()->json(['message' => 'Callback success', 'data' => $request->all()]);
     }
+
 
     /**
      * Step 3: Return URL after user completes payment
