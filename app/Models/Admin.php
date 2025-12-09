@@ -2,15 +2,15 @@
 
 namespace App\Models;
 
+use Filament\Panel;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Filament\Models\Contracts\FilamentUser;
 
-class Admin extends Authenticatable
+class Admin extends Authenticatable implements FilamentUser
 {
     use Notifiable;
-
-    protected $guard = 'filament';
 
     protected $fillable = [
         'name',
@@ -23,5 +23,8 @@ class Admin extends Authenticatable
         'remember_token',
     ];
 
-
+    public function canAccessPanel(Panel $panel): bool
+    {
+        return true;
+    }
 }
