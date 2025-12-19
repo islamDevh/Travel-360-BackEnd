@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\API\V1\Payment;
 
 use App\Http\Controllers\API\BaseController;
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Paytabscom\Laravel_paytabs\Facades\Paypage;
 use Illuminate\Support\Facades\Log;
@@ -42,7 +41,7 @@ class PaymentController extends BaseController
                     "http://localhost:8000/api/v1/payment/callback"
                 )
                 ->create_pay_page(null, null, null, null, null, null, null);
-
+                    
             return $pay;
         } catch (\Exception $e) {
             return $e;

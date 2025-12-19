@@ -21,11 +21,11 @@ class TouristGuideResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    protected static ?string $navigationLabel = 'المرشدين السياحيين';
-    
-    protected static ?string $modelLabel = 'مرشد سياحي';
-    
-    protected static ?string $pluralModelLabel = 'المرشدين السياحيين';
+    protected static ?string $navigationLabel = 'Tourist Guides';
+
+    protected static ?string $modelLabel = 'Tourist Guide';
+
+    protected static ?string $pluralModelLabel = 'Tourist Guides';
 
     public static function form(Schema $schema): Schema
     {
@@ -36,7 +36,7 @@ class TouristGuideResource extends Resource
     {
         return TouristGuidesTable::configure($table);
     }
-    
+
     public static function getRelations(): array
     {
         return [];

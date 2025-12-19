@@ -14,56 +14,57 @@ class TouristGuidesTable
         return $table
             ->columns([
                 ImageColumn::make('profile_image')
-                    ->label('الصورة')
+                    ->label('Profile Image')
                     ->circular()
                     ->defaultImageUrl(url('/images/default-avatar.png')),
 
                 TextColumn::make('name')
-                    ->label('الاسم')
+                    ->label('Name')
                     ->searchable()
                     ->sortable(),
 
                 TextColumn::make('phone')
-                    ->label('الهاتف')
+                    ->label('Phone')
                     ->searchable(),
 
                 TextColumn::make('email')
-                    ->label('البريد الإلكتروني')
+                    ->label('Email')
                     ->searchable()
                     ->copyable(),
 
                 TextColumn::make('language.name')
-                    ->label('اللغة')
+                    ->label('Language')
                     ->badge()
                     ->sortable(),
 
                 TextColumn::make('years_of_experience')
-                    ->label('سنوات الخبرة')
+                    ->label('Years of Experience')
                     ->numeric()
                     ->sortable()
-                    ->suffix(' سنة'),
+                    ->suffix(' years'),
 
                 TextColumn::make('license_expiry_date')
-                    ->label('انتهاء الرخصة')
+                    ->label('License Expiry Date')
                     ->date('d/m/Y')
                     ->sortable()
                     ->color(fn($state) => $state && $state->isPast() ? 'danger' : 'success'),
 
                 TextColumn::make('created_at')
-                    ->label('تاريخ الإضافة')
+                    ->label('Created At')
                     ->dateTime('d/m/Y h:i A')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
-            
+
             ->filters([
-                // SelectFilter::make('language_id')
-                //     ->label('اللغة')
-                //     ->relationship('language', 'name')
-                //     ->preload(),
+                  // SelectFilter::make('language_id')
+                  //     ->label('Language')
+                  //     ->relationship('language', 'name')
+                  //     ->preload(),
             ])
-            ->emptyStateHeading('لا يوجد مرشدين سياحيين')
-            ->emptyStateDescription('ابدأ بإضافة أول مرشد سياحي')
+
+            ->emptyStateHeading('No Tourist Guides Found')
+            ->emptyStateDescription('Start by creating the first tourist guide')
             ->emptyStateIcon('heroicon-o-user-group');
     }
 }

@@ -17,27 +17,27 @@ class TouristGuideForm
     public static function configure(Schema $schema): Schema
     {
         return $schema->components([
-            Section::make('البيانات الأساسية')
+            Section::make('Basic Information')
                 ->schema([
                     TextInput::make('name')
-                        ->label('الاسم')
+                        ->label('Name')
                         ->maxLength(255)
                         ->nullable(),
 
                     TextInput::make('phone')
-                        ->label('رقم الهاتف')
+                        ->label('Phone Number')
                         ->tel()
                         ->maxLength(255)
                         ->nullable(),
 
                     TextInput::make('email')
-                        ->label('البريد الإلكتروني')
+                        ->label('Email Address')
                         ->email()
                         ->maxLength(255)
                         ->nullable(),
 
                     FileUpload::make('profile_image')
-                        ->label('الصورة الشخصية')
+                        ->label('Profile Image')
                         ->image()
                         ->directory('tourist-guides/profiles')
                         ->nullable()
@@ -45,22 +45,22 @@ class TouristGuideForm
                 ])
                 ->columns(2),
 
-            Section::make('الخبرات والمهارات')
+            Section::make('Experience & Skills')
                 ->schema([
                     Textarea::make('experiences')
-                        ->label('الخبرات')
+                        ->label('Experiences')
                         ->rows(4)
                         ->nullable()
                         ->columnSpanFull(),
 
-                    // Select::make('language_id')
-                    //     ->label('اللغة')
-                    //     ->searchable()
-                    //     ->nullable()
-                    //     ->preload(),
+                      // Select::make('language_id')
+                      //     ->label('Language')
+                      //     ->searchable()
+                      //     ->nullable()
+                      //     ->preload(),
 
                     TextInput::make('years_of_experience')
-                        ->label('سنوات الخبرة')
+                        ->label('Years of Experience')
                         ->numeric()
                         ->minValue(0)
                         ->maxValue(50)
@@ -68,35 +68,35 @@ class TouristGuideForm
                 ])
                 ->columns(2),
 
-            Section::make('رخصة القيادة')
+            Section::make('Driving License')
                 ->schema([
                     FileUpload::make('driving_license_image')
-                        ->label('صورة رخصة القيادة')
+                        ->label('Driving License Image')
                         ->image()
                         ->directory('tourist-guides/licenses')
                         ->nullable()
                         ->maxSize(2048),
 
                     DatePicker::make('license_expiry_date')
-                        ->label('تاريخ انتهاء الرخصة')
+                        ->label('License Expiry Date')
                         ->native(false)
                         ->displayFormat('d/m/Y')
                         ->nullable(),
                 ])
                 ->columns(2),
 
-            Section::make('المستندات والملاحظات')
+            Section::make('Documents & Notes')
                 ->schema([
                     FileUpload::make('cv')
-                        ->label('السيرة الذاتية (CV)')
+                        ->label('CV (PDF)')
                         ->acceptedFileTypes(['application/pdf'])
                         ->directory('tourist-guides/cvs')
                         ->nullable()
                         ->maxSize(5120)
-                        ->helperText('يرجى رفع ملف PDF فقط'),
+                        ->helperText('Please upload PDF file only'),
 
                     Textarea::make('notes')
-                        ->label('ملاحظات')
+                        ->label('Notes')
                         ->rows(3)
                         ->nullable()
                         ->columnSpanFull(),
