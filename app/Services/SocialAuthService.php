@@ -2,8 +2,10 @@
 
 namespace App\Services;
 
+use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Support\Str;
+use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 
 class SocialAuthService
 {
@@ -11,25 +13,33 @@ class SocialAuthService
         protected GoogleService $GoogleService,
         protected AppleService $AppleService,
         protected FacebookService $FacebookService
-    ) {}
-
-    public function fetchUserFromProvider($provider, $token)
-    {
-        switch ($provider) {
-            case 'google':
-                return $this->GoogleService->fetchUser($token);
-            case 'apple':
-                return $this->AppleService->fetchUser($token);
-            case 'facebook':
-                return $this->FacebookService->fetchUser($token);
-            default:
-                throw new \Exception('Invalid provider');
-        }
+    ) {
     }
 
-    public function firstOrCreateUser($socialUser, $provider)
+    public function socialLogin(string $token, string $provider): array
     {
-        $user = User::where('social_id', $socialUser['id'])
+        $socialUser = $this->fetchUserFromProvider($provider, $token);
+        $user       = $this->firstOrCreateUser($socialUser, $provider);
+
+        return [
+            'token' => JWTAuth::fromUser($user),
+            'user'  => new UserResource($user),
+        ];
+    }
+
+    private function fetchUserFromProvider(string $provider, string $token): array
+    {
+        return match ($provider) {
+            'google'   => $this->GoogleService->fetchUser($token),
+            'apple'    => $this->AppleService->fetchUser($token),
+            'facebook' => $this->FacebookService->fetchUser($token),
+            default    => abort(400, 'Invalid provider.'),
+        };
+    }
+
+    private function firstOrCreateUser(array $socialUser, string $provider): User
+    {
+        $user = User::where('provider_id', $socialUser['id'])
             ->where('provider', $provider)
             ->first();
 
@@ -42,20 +52,23 @@ class SocialAuthService
 
             if ($user) {
                 $user->update([
-                    'social_id' => $socialUser['id'],
-                    'provider'  => $provider,
+                    'provider_id' => $socialUser['id'],
+                    'provider'    => $provider,
                 ]);
                 return $user;
             }
         }
 
         return User::create([
-            'name' => $socialUser['name'] ?? 'User',
-            'email' => $socialUser['email'] ?? null,
-            'social_id' => $socialUser['id'],
-            'provider' => $provider,
+            'first_name'        => $socialUser['first_name'] ?? 'User',
+            'last_name'         => $socialUser['last_name'] ?? '',
+            'full_name'         => $socialUser['name'] ?? 'User',
+            'email'             => $socialUser['email'] ?? null,
+            'provider_id'       => $socialUser['id'],
+            'provider'          => $provider,
+            'registered_by'     => 'email',
             'email_verified_at' => !empty($socialUser['email']) ? now() : null,
-            'password' => bcrypt(Str::random(16)),
+            'password'          => Str::random(16),
         ]);
     }
 }

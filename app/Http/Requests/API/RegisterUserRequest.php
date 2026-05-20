@@ -3,7 +3,6 @@
 namespace App\Http\Requests\API;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Password;
 
 class RegisterUserRequest extends FormRequest
 {
@@ -26,7 +25,7 @@ class RegisterUserRequest extends FormRequest
             'registered_by' => 'required|in:email,phone',
             'first_name'    => 'required|string|max:255',
             'last_name'     => 'required|string|max:255',
-            'email'         => 'nullable|string|email|unique:users,email',
+            'email'         => 'required|string|email|unique:users,email',
             'phone'         => 'required|string|max:15|unique:users,phone',
             'password'      => 'required|string|confirmed|min:8',
             'fcm_token'     => 'required|string',

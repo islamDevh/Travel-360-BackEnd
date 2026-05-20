@@ -1,94 +1,67 @@
 <?php
 
-
 namespace App\Services;
 
 use App\Mail\emails\EmailVerificationOTP;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Mail;
 
 class OTPService
 {
-    public function send_email_otp($user)
+    public function send_email_otp(User $user): void
     {
-        $cacheKey = 'otp_send_limit_' . $user->id;
+        $cacheKey  = 'otp_send_limit_' . $user->id;
         $sendCount = Cache::get($cacheKey, 0);
 
         if ($sendCount >= 3) {
-            return [
-                'success' => false,
-                'message' => 'Too many OTP requests. Please try resend again later after 3 minutes.',
-            ];
+            abort(429, 'Too many OTP requests. Please try again after 3 minutes.');
         }
 
-        // generate OTP
-        $otp = rand(1000, 9999);
-        $user->otp = $otp;
+        $otp                 = rand(1000, 9999);
+        $user->otp           = $otp;
         $user->otp_expires_at = Carbon::now()->addMinutes(3);
         $user->save();
 
         Mail::to($user->email)->send(new EmailVerificationOTP($otp));
 
-        // increment counter with expiry
         Cache::put($cacheKey, $sendCount + 1, now()->addMinutes(3));
-        return ['success' => true];
     }
 
-    
+    public function send_SMS_OTP(): void
+    {
+        // TODO: integrate SMS provider
+    }
 
-
-
-    public function verify_OTP($otp, $user)
+    public function verify_OTP(string $otp, User $user): void
     {
         $cacheKey = 'otp_attempts_' . $user->id;
         $attempts = Cache::get($cacheKey, 0);
 
         if ($attempts >= 5) {
-            return [
-                'success' => false,
-                'message' => 'Too many tries. Please try again later.'
-            ];
+            abort(429, 'Too many tries. Please try again later.');
         }
 
         if (!$user->otp || $user->otp_expires_at < now()) {
-            return [
-                'success' => false,
-                'message' => 'OTP has expired, please request a new one'
-            ];
+            abort(400, 'OTP has expired, please request a new one.');
         }
 
-        if (trim($otp) !== (string)$user->otp) {
+        if (trim($otp) !== (string) $user->otp) {
             Cache::put($cacheKey, $attempts + 1, now()->addMinutes(3));
-
-            return [
-                'success' => false,
-                'message' => 'Invalid OTP'
-            ];
+            abort(400, 'Invalid OTP.');
         }
 
-        // mark verified
         if ($user->registered_by === 'email') {
             $user->email_verified_at = now();
+        } else {
+            $user->phone_verified_at = now();
         }
 
-        // reset OTP
-        $user->otp = null;
+        $user->otp           = null;
         $user->otp_expires_at = null;
         $user->save();
 
         Cache::forget($cacheKey);
-
-        return [
-            'success' => true,
-            'message' => 'User verified successfully'
-        ];
-    }
-
-    public function send_SMS_OTP($user)
-    {
-        return [
-            'success' => true,
-        ];
     }
 }

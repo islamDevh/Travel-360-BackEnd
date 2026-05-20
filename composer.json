@@ -14,9 +14,11 @@
         "laravel/telescope": "^5.11",
         "laravel/tinker": "^2.10.1",
         "paytabscom/laravel_paytabs": "^1.9",
-        "php-open-source-saver/jwt-auth": "^2.8"
+        "php-open-source-saver/jwt-auth": "^2.8",
+        "spatie/laravel-medialibrary": "^11.22"
     },
     "require-dev": {
+        "barryvdh/laravel-ide-helper": "^3.7",
         "fakerphp/faker": "^1.23",
         "laravel/pail": "^1.2.2",
         "laravel/pint": "^1.24",
@@ -35,10 +37,7 @@
     "autoload-dev": {
         "psr-4": {
             "Tests\\": "tests/"
-        },
-        "files": [
-            "app/Helpers/UploadPaths.php"
-        ]
+        }
     },
     "scripts": {
         "post-autoload-dump": [

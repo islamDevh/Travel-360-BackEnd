@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(composer dump-autoload *)",
+      "Bash(php artisan *)",
+      "Bash(composer show *)"
+    ]
+  }
+}
