@@ -16,7 +16,7 @@ class AuthService
     {
     }
 
-    public function register(array $data): array
+    public function register(array $data)
     {
         DB::beginTransaction();
 
@@ -39,9 +39,9 @@ class AuthService
         DB::commit();
 
         if ($data['registered_by'] === 'email') {
-            $this->OTPService->send_email_otp($user);
+            $this->OTPService->sendEmailOtp($user);
         } else {
-            $this->OTPService->send_SMS_OTP();
+            $this->OTPService->sendSmsOtp();
         }
 
         return [
@@ -50,7 +50,7 @@ class AuthService
         ];
     }
 
-    public function login(array $data): array
+    public function login(array $data)
     {
         if (!$token = JWTAuth::attempt(['email' => $data['email'], 'password' => $data['password']])) {
             abort(401, 'Invalid email or password.');
@@ -79,17 +79,17 @@ class AuthService
         ];
     }
 
-    public function logout(): void
+    public function logout()
     {
         JWTAuth::invalidate(JWTAuth::getToken());
     }
 
-    public function me(): UserResource
+    public function me()
     {
         return new UserResource(auth()->user());
     }
 
-    public function refresh(): array
+    public function refresh()
     {
         return [
             'token' => JWTAuth::refresh(JWTAuth::getToken()),
@@ -97,11 +97,11 @@ class AuthService
         ];
     }
 
-    public function verifyOtp(array $data): array
+    public function verifyOtp(array $data)
     {
         $user = User::findOrFail($data['user_id']);
 
-        $this->OTPService->verify_OTP($data['otp'], $user);
+        $this->OTPService->verifyOtp($data['otp'], $user);
 
         return [
             'token' => JWTAuth::fromUser($user),
@@ -109,36 +109,36 @@ class AuthService
         ];
     }
 
-    public function resendOtp(): void
+    public function resendOtp()
     {
         $user = auth()->user();
 
         if ($user->registered_by === 'email') {
-            $this->OTPService->send_email_otp($user);
+            $this->OTPService->sendEmailOtp($user);
         } else {
-            $this->OTPService->send_SMS_OTP();
+            $this->OTPService->sendSmsOtp();
         }
     }
 
-    public function forgotPassword(array $data): void
+    public function forgotPassword(array $data)
     {
         if ($data['registered_by'] === 'email') {
             $user = User::where('email', $data['email'])->firstOrFail();
-            $this->OTPService->send_email_otp($user);
+            $this->OTPService->sendEmailOtp($user);
         } else {
             $user = User::where('phone', $data['phone'])->firstOrFail();
-            $this->OTPService->send_SMS_OTP();
+            $this->OTPService->sendSmsOtp();
         }
     }
 
-    public function resetPassword(array $data): void
+    public function resetPassword(array $data)
     {
         $user           = auth()->user();
         $user->password = $data['password'];
         $user->save();
     }
 
-    public function updateProfile(array $data): UserResource
+    public function updateProfile(array $data)
     {
         $user = auth()->user();
 
@@ -148,10 +148,10 @@ class AuthService
             $user->addMedia($data['image'])->toMediaCollection('avatar');
         }
 
-        return new UserResource($user->fresh());
+        return true;
     }
 
-    public function changePassword(array $data): void
+    public function changePassword(array $data)
     {
         $user = auth()->user();
 

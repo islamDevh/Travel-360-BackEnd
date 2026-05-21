@@ -5,7 +5,6 @@ namespace App\Http\Controllers\API\Auth;
 use App\Http\Controllers\API\BaseController;
 use App\Services\SocialAuthService;
 use Illuminate\Http\Request;
-use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 
 class SocialAuthController extends BaseController
 {
@@ -13,7 +12,7 @@ class SocialAuthController extends BaseController
     {
     }
 
-    public function social_login(Request $request, string $provider)
+    public function socialLogin(Request $request, string $provider)
     {
         $request->validate(['token' => 'required|string']);
 

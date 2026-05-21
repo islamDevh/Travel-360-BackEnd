@@ -14,18 +14,18 @@ Route::group(['prefix' => 'auth'], function () {
 
     Route::post('register', [AuthController::class, 'register']);
     Route::post('login', [AuthController::class, 'login'])->name('login');
-    Route::post('verify-otp', [VerificationController::class, 'verify_otp']);
-    Route::post('social-login/{provider}', [SocialAuthController::class, 'social_login']);
-    Route::post('forgot-password', [ResetPasswordController::class, 'forgot_password']);
+    Route::post('verify-otp', [VerificationController::class, 'verifyOtp']);
+    Route::post('social-login/{provider}', [SocialAuthController::class, 'socialLogin']);
+    Route::post('forgot-password', [ResetPasswordController::class, 'forgotPassword']);
 
     Route::group(['middleware' => 'auth:api'], function () {
         Route::post('logout', [AuthController::class, 'logout']);
         Route::post('refresh', [AuthController::class, 'refresh']);
         Route::get('me', [AuthController::class, 'me']);
-        Route::post('resend-otp', [VerificationController::class, 'resend_otp']);
-        Route::post('reset-password', [ResetPasswordController::class, 'reset_password']);
-        Route::post('update-profile', [AuthController::class, 'update_profile']);
-        Route::post('change-password', [AuthController::class, 'change_password']);
+        Route::post('resend-otp', [VerificationController::class, 'resendOtp']);
+        Route::post('reset-password', [ResetPasswordController::class, 'resetPassword']);
+        Route::post('update-profile', [AuthController::class, 'updateProfile']);
+        Route::post('change-password', [AuthController::class, 'changePassword']);
     });
 });
 

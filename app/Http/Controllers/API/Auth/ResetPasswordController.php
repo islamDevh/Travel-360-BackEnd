@@ -13,13 +13,13 @@ class ResetPasswordController extends BaseController
     {
     }
 
-    public function forgot_password(ForgotPasswordRequest $request)
+    public function forgotPassword(ForgotPasswordRequest $request)
     {
         $this->authService->forgotPassword($request->validated());
         return $this->successResponse(null);
     }
 
-    public function reset_password(ResetPasswordRequest $request)
+    public function resetPassword(ResetPasswordRequest $request)
     {
         $this->authService->resetPassword($request->validated());
         return $this->successResponse(null);

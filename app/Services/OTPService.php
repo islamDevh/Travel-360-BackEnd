@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Mail;
 
 class OTPService
 {
-    public function send_email_otp(User $user): void
+    public function sendEmailOtp(User $user)
     {
         $cacheKey  = 'otp_send_limit_' . $user->id;
         $sendCount = Cache::get($cacheKey, 0);
@@ -19,8 +19,8 @@ class OTPService
             abort(429, 'Too many OTP requests. Please try again after 3 minutes.');
         }
 
-        $otp                 = rand(1000, 9999);
-        $user->otp           = $otp;
+        $otp                  = rand(1000, 9999);
+        $user->otp            = $otp;
         $user->otp_expires_at = Carbon::now()->addMinutes(3);
         $user->save();
 
@@ -29,12 +29,12 @@ class OTPService
         Cache::put($cacheKey, $sendCount + 1, now()->addMinutes(3));
     }
 
-    public function send_SMS_OTP(): void
+    public function sendSmsOtp()
     {
         // TODO: integrate SMS provider
     }
 
-    public function verify_OTP(string $otp, User $user): void
+    public function verifyOtp(string $otp, User $user)
     {
         $cacheKey = 'otp_attempts_' . $user->id;
         $attempts = Cache::get($cacheKey, 0);
@@ -58,7 +58,7 @@ class OTPService
             $user->phone_verified_at = now();
         }
 
-        $user->otp           = null;
+        $user->otp            = null;
         $user->otp_expires_at = null;
         $user->save();
 

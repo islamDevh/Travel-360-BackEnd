@@ -45,13 +45,13 @@ class AuthController extends BaseController
         return $this->successResponse($data);
     }
 
-    public function update_profile(UpdateProfileRequest $request)
+    public function updateProfile(UpdateProfileRequest $request)
     {
         $data = $this->authService->updateProfile($request->validated());
         return $this->successResponse($data);
     }
 
-    public function change_password(ChangePasswordRequest $request)
+    public function changePassword(ChangePasswordRequest $request)
     {
         $this->authService->changePassword($request->validated());
         return $this->successResponse(null);

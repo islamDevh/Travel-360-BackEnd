@@ -16,7 +16,7 @@ class SocialAuthService
     ) {
     }
 
-    public function socialLogin(string $token, string $provider): array
+    public function socialLogin(string $token, string $provider)
     {
         $socialUser = $this->fetchUserFromProvider($provider, $token);
         $user       = $this->firstOrCreateUser($socialUser, $provider);

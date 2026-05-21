@@ -3,12 +3,10 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 class BaseController extends Controller
 {
-    public function successResponse($data = null, $message = 'Success operation', $code = 200): JsonResponse
+    public function successResponse($data = null, $message = 'Success operation', $code = 200)
     {
         return response()->json([
             'success' => true,
@@ -18,7 +16,7 @@ class BaseController extends Controller
         ], $code);
     }
 
-    public function errorResponse($message = 'Something went wrong', $code = 500): JsonResponse
+    public function errorResponse($message = 'Something went wrong', $code = 500)
     {
         return response()->json([
             'success' => false,
@@ -27,12 +25,12 @@ class BaseController extends Controller
         ], $code);
     }
 
-    public function notFoundResponse($message = 'Resource not found'): JsonResponse
+    public function notFoundResponse($message = 'Resource not found')
     {
         return $this->errorResponse($message, 404);
     }
 
-    public function validationErrorResponse(array $errors, $message = 'Validation failed', $code = 422): JsonResponse
+    public function validationErrorResponse(array $errors, $message = 'Validation failed', $code = 422)
     {
         $formatted = [];
 
@@ -48,13 +46,12 @@ class BaseController extends Controller
         ], $code);
     }
 
-
-    public function unauthorizedResponse($message = 'Unauthorized'): JsonResponse
+    public function unauthorizedResponse($message = 'Unauthorized')
     {
         return $this->errorResponse($message, 401);
     }
 
-    public function PaginationResponse($paginator, $message = 'Data retrieved successfully', $code = 200): JsonResponse
+    public function paginationResponse($paginator, $message = 'Data retrieved successfully', $code = 200)
     {
         return response()->json([
             'success' => true,
