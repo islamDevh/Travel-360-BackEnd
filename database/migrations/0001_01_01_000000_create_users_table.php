@@ -17,13 +17,14 @@ return new class extends Migration
             $table->string('last_name');
             $table->string('full_name');
             $table->enum('gender', ['male', 'female'])->nullable();
+            $table->string('type'); // user | guide | admin
             $table->string('image')->nullable();
             $table->enum('registered_by', ['email', 'phone',]);
             $table->string('provider')->nullable();
             $table->string('provider_id')->nullable();
             $table->string('email')->unique()->nullable();
             $table->timestamp('email_verified_at')->nullable();
-            $table->string('phone', 20)->unique()->nullable();
+            $table->string('phone')->unique()->nullable();
             $table->timestamp('phone_verified_at')->nullable();
             $table->string('otp', 4)->nullable();
             $table->timestamp('otp_expires_at')->nullable();

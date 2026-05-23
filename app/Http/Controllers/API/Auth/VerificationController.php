@@ -12,12 +12,18 @@ class VerificationController extends BaseController
     {
     }
 
+    /**
+     * Verify the OTP submitted by the user.
+     */
     public function verifyOtp(VerifyOtpRequest $request)
     {
         $data = $this->authService->verifyOtp($request->validated());
         return $this->successResponse($data);
     }
 
+    /**
+     * Resend an OTP to the authenticated user.
+     */
     public function resendOtp()
     {
         $this->authService->resendOtp();

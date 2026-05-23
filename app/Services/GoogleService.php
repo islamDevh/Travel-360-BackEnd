@@ -6,6 +6,9 @@ use Illuminate\Support\Facades\Http;
 
 class GoogleService
 {
+    /**
+     * Verify a Firebase ID token and return the user's profile data from Google.
+     */
     public function fetchUser($idToken)
     {
         $apiKey = env('FIREBASE_API_KEY');

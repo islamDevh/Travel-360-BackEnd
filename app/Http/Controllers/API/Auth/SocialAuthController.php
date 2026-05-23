@@ -12,6 +12,9 @@ class SocialAuthController extends BaseController
     {
     }
 
+    /**
+     * Authenticate a user via a third-party social provider.
+     */
     public function socialLogin(Request $request, string $provider)
     {
         $request->validate(['token' => 'required|string']);

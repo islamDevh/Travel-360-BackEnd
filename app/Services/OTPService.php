@@ -10,6 +10,9 @@ use Illuminate\Support\Facades\Mail;
 
 class OTPService
 {
+    /**
+     * Generate an OTP, save it to the user, and send it via email.
+     */
     public function sendEmailOtp(User $user)
     {
         $cacheKey  = 'otp_send_limit_' . $user->id;
@@ -29,11 +32,17 @@ class OTPService
         Cache::put($cacheKey, $sendCount + 1, now()->addMinutes(3));
     }
 
+    /**
+     * Send an OTP via SMS (pending SMS provider integration).
+     */
     public function sendSmsOtp()
     {
         // TODO: integrate SMS provider
     }
 
+    /**
+     * Validate the submitted OTP against the stored value and mark the user as verified.
+     */
     public function verifyOtp(string $otp, User $user)
     {
         $cacheKey = 'otp_attempts_' . $user->id;

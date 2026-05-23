@@ -4,6 +4,8 @@ use App\Http\Controllers\API\Auth\AuthController;
 use App\Http\Controllers\API\Auth\ResetPasswordController;
 use App\Http\Controllers\API\Auth\SocialAuthController;
 use App\Http\Controllers\API\Auth\VerificationController;
+use App\Http\Controllers\API\GuideApp\GuideAppController;
+use App\Http\Controllers\API\Lookup\LookupController;
 use App\Http\Controllers\API\Payment\PaymentController;
 use Illuminate\Support\Facades\Route;
 
@@ -27,6 +29,23 @@ Route::group(['prefix' => 'auth'], function () {
         Route::post('update-profile', [AuthController::class, 'updateProfile']);
         Route::post('change-password', [AuthController::class, 'changePassword']);
     });
+});
+
+/**
+ * Lookup APIs 
+ */
+Route::group(['prefix' => 'lookups'], function () {
+    Route::get('languages', [LookupController::class, 'languages']);
+    Route::get('countries', [LookupController::class, 'countries']);
+    Route::get('saudi-areas', [LookupController::class, 'saudiAreas']);
+});
+
+/**
+ * Guide Application APIs.
+ */
+Route::group(['prefix' => 'guide-apps', 'middleware' => 'auth:api'], function () {
+    Route::post('store', [GuideAppController::class, 'store']);
+    Route::get('my-applications', [GuideAppController::class, 'myApplications']);
 });
 
 /**

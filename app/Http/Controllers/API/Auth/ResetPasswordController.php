@@ -13,12 +13,18 @@ class ResetPasswordController extends BaseController
     {
     }
 
+    /**
+     * Send a password reset OTP to the user.
+     */
     public function forgotPassword(ForgotPasswordRequest $request)
     {
         $this->authService->forgotPassword($request->validated());
         return $this->successResponse(null);
     }
 
+    /**
+     * Reset the user's password using a verified OTP.
+     */
     public function resetPassword(ResetPasswordRequest $request)
     {
         $this->authService->resetPassword($request->validated());

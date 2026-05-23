@@ -6,6 +6,9 @@ use Illuminate\Support\Facades\Http;
 
 class FacebookService
 {
+    /**
+     * Fetch the user's profile data from the Facebook Graph API using an access token.
+     */
     public function fetchUser($token)
     {
         $response = Http::get('https://graph.facebook.com/me', [

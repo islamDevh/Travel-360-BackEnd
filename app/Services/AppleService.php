@@ -10,6 +10,9 @@ use Illuminate\Support\Facades\Http;
 
 class AppleService
 {
+    /**
+     * Verify an Apple identity token and return the user's profile data.
+     */
     public function fetchUser($token)
     {
         $tks = explode('.', $token);
@@ -22,8 +25,6 @@ class AppleService
 
         $response = Http::get('https://appleid.apple.com/auth/keys');
 
-
-        
         $keys = $response->json()['keys'];
 
         // Convert keys to JWK format

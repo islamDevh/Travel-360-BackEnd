@@ -16,6 +16,9 @@ class SocialAuthService
     ) {
     }
 
+    /**
+     * Authenticate via a social provider token and return a JWT token.
+     */
     public function socialLogin(string $token, string $provider)
     {
         $socialUser = $this->fetchUserFromProvider($provider, $token);
@@ -27,6 +30,9 @@ class SocialAuthService
         ];
     }
 
+    /**
+     * Delegate token verification to the correct provider service.
+     */
     private function fetchUserFromProvider(string $provider, string $token): array
     {
         return match ($provider) {
@@ -37,6 +43,9 @@ class SocialAuthService
         };
     }
 
+    /**
+     * Find an existing user by provider ID or email, or create a new one.
+     */
     private function firstOrCreateUser(array $socialUser, string $provider): User
     {
         $user = User::where('provider_id', $socialUser['id'])

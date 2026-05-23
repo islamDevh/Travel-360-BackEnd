@@ -28,6 +28,7 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail, HasMe
         'registered_by',
         'otp',
         'otp_expires_at',
+        'type', // user | guide | admin
     ];
 
     protected $hidden = [
@@ -63,12 +64,8 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail, HasMe
             'first_name' => $this->first_name,
             'last_name'  => $this->last_name,
             'email'      => $this->email,
+            'type'       => $this->type, // user | guide | admin
         ];
-    }
-
-    public function isExpired(): bool
-    {
-        return Carbon::now()->greaterThan($this->email_verified_at->addMinutes(60));
     }
 
     public function devices()

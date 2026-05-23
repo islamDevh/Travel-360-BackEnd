@@ -16,6 +16,9 @@ class AuthService
     {
     }
 
+    /**
+     * Create a new user, register their device, and send a verification OTP.
+     */
     public function register(array $data)
     {
         DB::beginTransaction();
@@ -50,6 +53,9 @@ class AuthService
         ];
     }
 
+    /**
+     * Validate credentials, upsert the user's device, and return a JWT token.
+     */
     public function login(array $data)
     {
         if (!$token = JWTAuth::attempt(['email' => $data['email'], 'password' => $data['password']])) {
@@ -79,16 +85,25 @@ class AuthService
         ];
     }
 
+    /**
+     * Invalidate the current JWT token.
+     */
     public function logout()
     {
         JWTAuth::invalidate(JWTAuth::getToken());
     }
 
+    /**
+     * Return the authenticated user's data.
+     */
     public function me()
     {
         return new UserResource(auth()->user());
     }
 
+    /**
+     * Refresh the current JWT token and return a new one.
+     */
     public function refresh()
     {
         return [
@@ -97,6 +112,9 @@ class AuthService
         ];
     }
 
+    /**
+     * Verify the OTP for a given user and mark their contact as verified.
+     */
     public function verifyOtp(array $data)
     {
         $user = User::findOrFail($data['user_id']);
@@ -109,6 +127,9 @@ class AuthService
         ];
     }
 
+    /**
+     * Resend a verification OTP to the authenticated user.
+     */
     public function resendOtp()
     {
         $user = auth()->user();
@@ -120,6 +141,9 @@ class AuthService
         }
     }
 
+    /**
+     * Look up the user by email or phone and send a password reset OTP.
+     */
     public function forgotPassword(array $data)
     {
         if ($data['registered_by'] === 'email') {
@@ -131,6 +155,9 @@ class AuthService
         }
     }
 
+    /**
+     * Set a new password for the authenticated user.
+     */
     public function resetPassword(array $data)
     {
         $user           = auth()->user();
@@ -138,6 +165,9 @@ class AuthService
         $user->save();
     }
 
+    /**
+     * Update the authenticated user's profile fields and avatar.
+     */
     public function updateProfile(array $data)
     {
         $user = auth()->user();
@@ -151,6 +181,9 @@ class AuthService
         return true;
     }
 
+    /**
+     * Verify the current password then update it to the new one.
+     */
     public function changePassword(array $data)
     {
         $user = auth()->user();
@@ -160,5 +193,6 @@ class AuthService
         }
 
         $user->update(['password' => $data['password']]);
+        return true;
     }
 }

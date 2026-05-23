@@ -15,45 +15,66 @@ class AuthController extends BaseController
     {
     }
 
+    /**
+     * Register a new user.
+     */
     public function register(RegisterUserRequest $request)
     {
         $data = $this->authService->register($request->validated());
         return $this->successResponse($data);
     }
 
+    /**
+     * Authenticate a user and return a JWT token.
+     */
     public function login(LoginUserRequest $request)
     {
         $data = $this->authService->login($request->validated());
         return $this->successResponse($data);
     }
 
+    /**
+     * Invalidate the current user's token.
+     */
     public function logout()
     {
         $this->authService->logout();
         return $this->successResponse(null);
     }
 
+    /**
+     * Refresh the current JWT token and return a new one.
+     */
     public function refresh()
     {
         $data = $this->authService->refresh();
         return $this->successResponse($data);
     }
 
+    /**
+     * Return the authenticated user's profile data.
+     */
     public function me()
     {
         $data = $this->authService->me();
         return $this->successResponse($data);
     }
 
+    /**
+     * Update the authenticated user's profile information.
+     */
     public function updateProfile(UpdateProfileRequest $request)
     {
         $data = $this->authService->updateProfile($request->validated());
         return $this->successResponse($data);
     }
 
+    /**
+     * Change the authenticated user's password.
+     */
     public function changePassword(ChangePasswordRequest $request)
     {
-        $this->authService->changePassword($request->validated());
-        return $this->successResponse(null);
+        $data = $this->authService->changePassword($request->validated());
+        return $this->successResponse($data);
     }
 }

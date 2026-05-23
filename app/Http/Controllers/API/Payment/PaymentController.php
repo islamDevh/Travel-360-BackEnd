@@ -9,6 +9,9 @@ use Paytabscom\Laravel_paytabs\Facades\Paypage;
 
 class PaymentController extends BaseController
 {
+    /**
+     * Create a new PayTabs payment page and return the payment URL.
+     */
     public function createPayment(Request $request)
     {
         $pay = Paypage::sendPaymentCode('creditcard, mada, stcpay, applepay, tamara, tabby')
@@ -35,6 +38,9 @@ class PaymentController extends BaseController
         return $pay;
     }
 
+    /**
+     * Handle the payment gateway callback and log the response.
+     */
     public function paymentCallback(Request $request)
     {
         Log::channel('PayTabs')->info('Callback RAW: ' . $request->getContent());
@@ -43,6 +49,9 @@ class PaymentController extends BaseController
         return $this->successResponse($request->all());
     }
 
+    /**
+     * Handle the user return after completing or cancelling payment.
+     */
     public function paymentReturn(Request $request)
     {
         Log::channel('PayTabs')->info('Payment Return Data: ', $request->all());
