@@ -59,17 +59,11 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail, HasMe
 
     public function getJWTCustomClaims(): array
     {
-        return [
-            'id'         => $this->id,
-            'first_name' => $this->first_name,
-            'last_name'  => $this->last_name,
-            'email'      => $this->email,
-            'type'       => $this->type, // user | guide | admin
-        ];
+        return [];
     }
 
     public function devices()
     {
-        return $this->hasMany(UserDevice::class);
+        return $this->hasMany(Device::class);
     }
 }

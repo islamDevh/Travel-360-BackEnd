@@ -4,9 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class UserDevice extends Model
+class Device extends Model
 {
-    protected $guarded = ['id'];
+    protected $fillable = [
+        'user_id',
+        'fcm_token',
+        'device_type',
+    ];
 
     public function user()
     {

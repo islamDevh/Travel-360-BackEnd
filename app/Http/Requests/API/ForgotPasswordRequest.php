@@ -15,8 +15,8 @@ class ForgotPasswordRequest extends FormRequest
     {
         return [
             'registered_by' => 'required|in:email,phone',
-            'email'         => 'nullable|string|email|required_if:registered_by,email',
-            'phone'         => 'nullable|string|max:15|required_if:registered_by,phone',
+            'email'         => 'required_if:registered_by,email|string|email|max:255',
+            'phone'         => 'required_if:registered_by,phone|string|max:15',
         ];
     }
 }

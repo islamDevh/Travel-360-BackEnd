@@ -58,7 +58,6 @@ class ApiHandler extends BaseController
             if ($e instanceof HttpException) return $this->errorResponse($e->getMessage(), $e->getStatusCode());
 
             if ($e instanceof MissingAttributeException) return $this->errorResponse($e->getMessage(), 400);
-            if ($e instanceof QueryException) return $this->errorResponse('Database query error', 500);
             if ($e instanceof \BadMethodCallException) return $this->errorResponse('Bad method call: ' . $e->getMessage(), 400);
             if ($e instanceof \ErrorException) return $this->errorResponse($e->getMessage(), 400);
             if ($e instanceof \Error) return $this->errorResponse($e->getMessage(), 500);

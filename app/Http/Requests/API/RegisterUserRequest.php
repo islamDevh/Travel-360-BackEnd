@@ -25,11 +25,10 @@ class RegisterUserRequest extends FormRequest
             'registered_by' => 'required|in:email,phone',
             'first_name'    => 'required|string|max:255',
             'last_name'     => 'required|string|max:255',
-            'email'         => 'required|string|email|unique:users,email',
-            'phone'         => 'required|string|max:15|unique:users,phone',
+            'email'         => 'required_if:registered_by,email|string|email|unique:users,email',
+            'phone'         => 'required_if:registered_by,phone|string|max:15|unique:users,phone',
             'password'      => 'required|string|confirmed|min:8',
             'fcm_token'     => 'required|string',
-            'device_id'     => 'required|string',
             'device_type'   => 'required|string|in:android,ios',
         ];
     }

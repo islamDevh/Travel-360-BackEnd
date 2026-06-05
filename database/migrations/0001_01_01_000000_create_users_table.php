@@ -15,8 +15,8 @@ return new class extends Migration {
             $table->string('first_name');
             $table->string('last_name');
             $table->string('full_name');
+            $table->string('type')->default('user'); // user | guide | admin
             $table->enum('gender', ['male', 'female'])->nullable();
-            $table->string('type'); // user | guide | admin
             $table->enum('registered_by', ['email', 'phone',]);
             $table->string('provider')->nullable();
             $table->string('provider_id')->nullable();

@@ -3,14 +3,13 @@
 namespace App\Services;
 
 use App\Http\Resources\UserResource;
-use App\Mail\emails\EmailVerificationOTP;
 use App\Models\User;
-use App\Models\UserDevice;
+use App\Models\Device;
+use App\Supports\OtpSupport;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Mail;
 use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
-use Ichtrojan\Otp\Otp;
+
 class AuthService
 {
     /**
@@ -21,32 +20,28 @@ class AuthService
         DB::beginTransaction();
 
         $user = User::create([
-            'first_name'    => $data['first_name'],
-            'last_name'     => $data['last_name'],
-            'full_name'     => $data['first_name'] . ' ' . $data['last_name'],
-            'email'         => $data['email'],
-            'phone'         => $data['phone'],
-            'password'      => $data['password'],
+            'first_name' => $data['first_name'],
+            'last_name' => $data['last_name'],
+            'full_name' => $data['first_name'] . ' ' . $data['last_name'],
+            'email' => $data['email'],
+            'phone' => $data['phone'] ?? null,
+            'password' => $data['password'],
             'registered_by' => $data['registered_by'],
         ]);
 
         $user->devices()->create([
-            'device_id'   => $data['device_id'],
-            'fcm_token'   => $data['fcm_token'],
+            'fcm_token' => $data['fcm_token'],
             'device_type' => $data['device_type'],
         ]);
 
         DB::commit();
 
-        if ($data['registered_by'] === 'email') {
-            $this->sendEmailOtp($user);
-        } else {
-            $this->sendSmsOtp($user);
-        }
+        // send otp 
+        app(OtpSupport::class)->send($data['registered_by'], $user->email);
 
         return [
-            'user'  => new UserResource($user),
             'token' => JWTAuth::fromUser($user),
+            'user' => new UserResource($user),
         ];
     }
 
@@ -61,24 +56,24 @@ class AuthService
 
         $user = auth()->user();
 
-        $device = UserDevice::where('user_id', $user->id)
+        $device = Device::where('user_id', $user->id)
             ->where('device_id', $data['device_id'])
             ->first();
 
         if ($device) {
             $device->update(['fcm_token' => $data['fcm_token']]);
         } else {
-            UserDevice::create([
-                'user_id'     => $user->id,
-                'device_id'   => $data['device_id'],
-                'fcm_token'   => $data['fcm_token'],
-                'device_type' => $data['device_type'],
+            Device::create([
+                'user_id' => $user->id,
+                'device_id' => $data['device_id'],
+                'fcm_token' => $data['fcm_token'],
+                'type' => $data['type'],
             ]);
         }
 
         return [
             'token' => $token,
-            'user'  => new UserResource($user),
+            'user' => new UserResource($user),
         ];
     }
 
@@ -105,7 +100,7 @@ class AuthService
     {
         return [
             'token' => JWTAuth::refresh(JWTAuth::getToken()),
-            'user'  => new UserResource(auth()->user()),
+            'user' => new UserResource(auth()->user()),
         ];
     }
 
@@ -114,14 +109,10 @@ class AuthService
      */
     public function verifyOtp(array $data)
     {
-        $user       = User::findOrFail($data['user_id']);
+        $user = User::findOrFail($data['user_id']);
         $identifier = $user->registered_by === 'email' ? $user->email : $user->phone;
 
-        $result = (new Otp())->validate($identifier, $data['otp']);
-
-        if (!$result->status) {
-            abort(400, $result->message);
-        }
+        app(OtpSupport::class)->validate($identifier, $data['otp']);
 
         if ($user->registered_by === 'email') {
             $user->email_verified_at = now();
@@ -133,7 +124,7 @@ class AuthService
 
         return [
             'token' => JWTAuth::fromUser($user),
-            'user'  => new UserResource($user),
+            'user' => new UserResource($user),
         ];
     }
 
@@ -143,12 +134,8 @@ class AuthService
     public function resendOtp()
     {
         $user = auth()->user();
-
-        if ($user->registered_by === 'email') {
-            $this->sendEmailOtp($user);
-        } else {
-            $this->sendSmsOtp($user);
-        }
+        app(OtpSupport::class)->send($user->registered_by, $user->email);
+        return true;
     }
 
     /**
@@ -158,10 +145,10 @@ class AuthService
     {
         if ($data['registered_by'] === 'email') {
             $user = User::where('email', $data['email'])->firstOrFail();
-            $this->sendEmailOtp($user);
+            app(OtpSupport::class)->send('email', $user->email);
         } else {
             $user = User::where('phone', $data['phone'])->firstOrFail();
-            $this->sendSmsOtp($user);
+            app(OtpSupport::class)->send('sms', $user->phone);
         }
     }
 
@@ -170,7 +157,7 @@ class AuthService
      */
     public function resetPassword(array $data)
     {
-        $user           = auth()->user();
+        $user = auth()->user();
         $user->password = $data['password'];
         $user->save();
     }
@@ -204,29 +191,5 @@ class AuthService
 
         $user->update(['password' => $data['password']]);
         return true;
-    }
-
-    // -------------------------------------------------------------------------
-    // OTP helpers
-    // -------------------------------------------------------------------------
-
-    /**
-     * Generate an OTP and send it to the user's email.
-     */
-    private function sendEmailOtp(User $user): void
-    {
-        $result = (new Otp())->generate($user->email, 'numeric', 4, 3);
-
-        Mail::to($user->email)->send(new EmailVerificationOTP($result->token));
-    }
-
-    /**
-     * Generate an OTP for the user's phone number.
-     */
-    private function sendSmsOtp(User $user): void
-    {
-        $result = (new Otp())->generate($user->phone, 'numeric', 4, 3);
-
-        // TODO: integrate SMS provider and deliver the token to $user->phone
     }
 }

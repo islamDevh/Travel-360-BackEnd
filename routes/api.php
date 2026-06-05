@@ -17,8 +17,8 @@ Route::group(['prefix' => 'auth'], function () {
     Route::post('register', [AuthController::class, 'register']);
     Route::post('login', [AuthController::class, 'login'])->name('login');
     Route::post('verify-otp', [VerificationController::class, 'verifyOtp']);
-    Route::post('social-login/{provider}', [SocialAuthController::class, 'socialLogin']);
     Route::post('forgot-password', [ResetPasswordController::class, 'forgotPassword']);
+    Route::post('social-login/{provider}', [SocialAuthController::class, 'socialLogin']);
 
     Route::group(['middleware' => 'auth:api'], function () {
         Route::post('logout', [AuthController::class, 'logout']);

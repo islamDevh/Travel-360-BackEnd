@@ -25,11 +25,6 @@ class BaseController extends Controller
         ], $code);
     }
 
-    public function notFoundResponse($message = 'Resource not found')
-    {
-        return $this->errorResponse($message, 404);
-    }
-
     public function validationErrorResponse(array $errors, $message = 'Validation failed', $code = 422)
     {
         $formatted = [];
@@ -43,33 +38,6 @@ class BaseController extends Controller
             'code' => $code,
             'message' => $message,
             'data' => $formatted,
-        ], $code);
-    }
-
-    public function unauthorizedResponse($message = 'Unauthorized')
-    {
-        return $this->errorResponse($message, 401);
-    }
-
-    public function paginationResponse($paginator, $message = 'Data retrieved successfully', $code = 200)
-    {
-        return response()->json([
-            'success' => true,
-            'code' => $code,
-            'message' => $message,
-            'data' => $paginator->items(),
-            'pagination' => [
-                'total' => $paginator->total(),
-                'per_page' => $paginator->perPage(),
-                'current_page' => $paginator->currentPage(),
-                'last_page' => $paginator->lastPage(),
-            ],
-            'links' => [
-                'first' => $paginator->url(1),
-                'last' => $paginator->url($paginator->lastPage()),
-                'prev' => $paginator->previousPageUrl(),
-                'next' => $paginator->nextPageUrl(),
-            ],
         ], $code);
     }
 }
