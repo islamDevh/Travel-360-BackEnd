@@ -4,9 +4,12 @@ namespace App\Http\Controllers\API\Auth;
 
 use App\Http\Controllers\API\BaseController;
 use App\Http\Requests\API\ChangePasswordRequest;
+use App\Http\Requests\API\ForgotPasswordRequest;
 use App\Http\Requests\API\LoginUserRequest;
 use App\Http\Requests\API\RegisterUserRequest;
+use App\Http\Requests\API\ResetPasswordRequest;
 use App\Http\Requests\API\UpdateProfileRequest;
+use App\Http\Requests\API\VerifyOtpRequest;
 use App\Services\AuthService;
 
 class AuthController extends BaseController
@@ -76,5 +79,41 @@ class AuthController extends BaseController
     {
         $data = $this->authService->changePassword($request->validated());
         return $this->successResponse($data);
+    }
+
+    /**
+     * Verify the OTP submitted by the user.
+     */
+    public function verifyOtp(VerifyOtpRequest $request)
+    {
+        $data = $this->authService->verifyOtp($request->validated());
+        return $this->successResponse($data);
+    }
+
+    /**
+     * Resend a verification OTP to an unverified user.
+     */
+    public function resendOtp()
+    {
+        $this->authService->resendOtp();
+        return $this->successResponse(null);
+    }
+
+    /**
+     * Send a password reset OTP to the user.
+     */
+    public function forgotPassword(ForgotPasswordRequest $request)
+    {
+        $this->authService->forgotPassword($request->validated());
+        return $this->successResponse(null);
+    }
+
+    /**
+     * Reset the user's password using a verified OTP.
+     */
+    public function resetPassword(ResetPasswordRequest $request)
+    {
+        $this->authService->resetPassword($request->validated());
+        return $this->successResponse(null);
     }
 }

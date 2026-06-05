@@ -42,9 +42,22 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail, HasMe
     {
         return [
             'email_verified_at' => 'datetime',
-            'otp_expires_at'    => 'datetime',
-            'password'          => 'hashed',
+            'otp_expires_at' => 'datetime',
+            'password' => 'hashed',
         ];
+    }
+
+    /**
+     * check if user is verified based on registration method
+     * @return bool
+     */
+    public function isVerified(): bool
+    {
+        return match ($this->registered_by) {
+            'email' => !is_null($this->email_verified_at),
+            'phone' => !is_null($this->phone_verified_at),
+            default => false,
+        };
     }
 
     public function registerMediaCollections(): void

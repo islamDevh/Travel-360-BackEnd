@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Http\Resources\UserResource;
 use App\Models\User;
-use App\Models\Device;
 use App\Supports\OtpSupport;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -50,24 +49,24 @@ class AuthService
      */
     public function login(array $data)
     {
+        // check attempt and verify credentials
         if (!$token = JWTAuth::attempt(['email' => $data['email'], 'password' => $data['password']])) {
             abort(401, 'Invalid email or password.');
         }
 
         $user = auth()->user();
 
-        $device = Device::where('user_id', $user->id)
-            ->where('device_id', $data['device_id'])
-            ->first();
+        // check account verification status
+        abort_if(!$user->isVerified(), 403, 'Your ' . $user->registered_by . ' is not verified.');
+
+        $device = $user->devices()->where('device_type', $data['device_type'])->first();
 
         if ($device) {
             $device->update(['fcm_token' => $data['fcm_token']]);
         } else {
-            Device::create([
-                'user_id' => $user->id,
-                'device_id' => $data['device_id'],
+            $user->devices()->create([
                 'fcm_token' => $data['fcm_token'],
-                'type' => $data['type'],
+                'device_type' => $data['device_type'],
             ]);
         }
 
@@ -134,7 +133,9 @@ class AuthService
     public function resendOtp()
     {
         $user = auth()->user();
-        app(OtpSupport::class)->send($user->registered_by, $user->email);
+        $via = $user->registered_by === 'email' ? 'email' : 'sms';
+        $identifier = $user->registered_by === 'email' ? $user->email : $user->phone;
+        app(OtpSupport::class)->send($via, $identifier);
         return true;
     }
 

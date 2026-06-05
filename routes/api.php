@@ -1,9 +1,7 @@
 <?php
 
 use App\Http\Controllers\API\Auth\AuthController;
-use App\Http\Controllers\API\Auth\ResetPasswordController;
 use App\Http\Controllers\API\Auth\SocialAuthController;
-use App\Http\Controllers\API\Auth\VerificationController;
 use App\Http\Controllers\API\GuideApp\GuideAppController;
 use App\Http\Controllers\API\Lookup\LookupController;
 use App\Http\Controllers\API\Payment\PaymentController;
@@ -16,16 +14,16 @@ Route::group(['prefix' => 'auth'], function () {
 
     Route::post('register', [AuthController::class, 'register']);
     Route::post('login', [AuthController::class, 'login'])->name('login');
-    Route::post('verify-otp', [VerificationController::class, 'verifyOtp']);
-    Route::post('forgot-password', [ResetPasswordController::class, 'forgotPassword']);
+    Route::post('verify-otp', [AuthController::class, 'verifyOtp']);
+    Route::post('forgot-password', [AuthController::class, 'forgotPassword']);
     Route::post('social-login/{provider}', [SocialAuthController::class, 'socialLogin']);
 
     Route::group(['middleware' => 'auth:api'], function () {
         Route::post('logout', [AuthController::class, 'logout']);
+        Route::post('resend-otp', [AuthController::class, 'resendOtp']);
         Route::post('refresh', [AuthController::class, 'refresh']);
         Route::get('me', [AuthController::class, 'me']);
-        Route::post('resend-otp', [VerificationController::class, 'resendOtp']);
-        Route::post('reset-password', [ResetPasswordController::class, 'resetPassword']);
+        Route::post('reset-password', [AuthController::class, 'resetPassword']);
         Route::post('update-profile', [AuthController::class, 'updateProfile']);
         Route::post('change-password', [AuthController::class, 'changePassword']);
     });
