@@ -25,7 +25,6 @@ return new class extends Migration {
             $table->string('phone')->unique()->nullable();
             $table->timestamp('phone_verified_at')->nullable();
             $table->string('password')->nullable();
-            $table->rememberToken();
             $table->timestamps();
         });
 
@@ -45,6 +44,7 @@ return new class extends Migration {
     public function down(): void
     {
         Schema::dropIfExists('users');
+        Schema::dropIfExists('password_reset_tokens');
         Schema::dropIfExists('sessions');
     }
 };
