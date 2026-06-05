@@ -26,23 +26,19 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail, HasMe
         'phone',
         'password',
         'registered_by',
-        'otp',
-        'otp_expires_at',
         'type', // user | guide | admin
     ];
 
     protected $hidden = [
         'password',
         'remember_token',
-        'created_at',
-        'updated_at',
     ];
 
     protected function casts(): array
     {
         return [
             'email_verified_at' => 'datetime',
-            'otp_expires_at' => 'datetime',
+            'phone_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
     }
