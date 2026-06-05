@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -18,7 +17,6 @@ return new class extends Migration
             $table->string('full_name');
             $table->enum('gender', ['male', 'female'])->nullable();
             $table->string('type'); // user | guide | admin
-            $table->string('image')->nullable();
             $table->enum('registered_by', ['email', 'phone',]);
             $table->string('provider')->nullable();
             $table->string('provider_id')->nullable();
@@ -26,8 +24,6 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('phone')->unique()->nullable();
             $table->timestamp('phone_verified_at')->nullable();
-            $table->string('otp', 4)->nullable();
-            $table->timestamp('otp_expires_at')->nullable();
             $table->string('password')->nullable();
             $table->rememberToken();
             $table->timestamps();

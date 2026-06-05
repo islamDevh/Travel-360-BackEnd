@@ -11,6 +11,7 @@ class UserResource extends JsonResource
     {
         return [
             'id'                => $this->id,
+            'type'              => $this->type,
             'first_name'        => $this->first_name,
             'last_name'         => $this->last_name,
             'full_name'         => $this->full_name,
@@ -20,6 +21,7 @@ class UserResource extends JsonResource
             'phone'             => $this->phone,
             'image'             => $this->getFirstMediaUrl('avatar') ?: null,
             'email_verified_at' => $this->email_verified_at,
+            'phone_verified_at' => $this->phone_verified_at,
         ];
     }
 }

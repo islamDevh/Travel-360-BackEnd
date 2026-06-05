@@ -3,19 +3,16 @@
 namespace App\Services;
 
 use App\Http\Resources\UserResource;
+use App\Mail\emails\EmailVerificationOTP;
 use App\Models\User;
 use App\Models\UserDevice;
-use App\Services\OTPService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
-
+use Ichtrojan\Otp\Otp;
 class AuthService
 {
-    public function __construct(protected OTPService $OTPService)
-    {
-    }
-
     /**
      * Create a new user, register their device, and send a verification OTP.
      */
@@ -42,9 +39,9 @@ class AuthService
         DB::commit();
 
         if ($data['registered_by'] === 'email') {
-            $this->OTPService->sendEmailOtp($user);
+            $this->sendEmailOtp($user);
         } else {
-            $this->OTPService->sendSmsOtp();
+            $this->sendSmsOtp($user);
         }
 
         return [
@@ -117,9 +114,22 @@ class AuthService
      */
     public function verifyOtp(array $data)
     {
-        $user = User::findOrFail($data['user_id']);
+        $user       = User::findOrFail($data['user_id']);
+        $identifier = $user->registered_by === 'email' ? $user->email : $user->phone;
 
-        $this->OTPService->verifyOtp($data['otp'], $user);
+        $result = (new Otp())->validate($identifier, $data['otp']);
+
+        if (!$result->status) {
+            abort(400, $result->message);
+        }
+
+        if ($user->registered_by === 'email') {
+            $user->email_verified_at = now();
+        } else {
+            $user->phone_verified_at = now();
+        }
+
+        $user->save();
 
         return [
             'token' => JWTAuth::fromUser($user),
@@ -135,9 +145,9 @@ class AuthService
         $user = auth()->user();
 
         if ($user->registered_by === 'email') {
-            $this->OTPService->sendEmailOtp($user);
+            $this->sendEmailOtp($user);
         } else {
-            $this->OTPService->sendSmsOtp();
+            $this->sendSmsOtp($user);
         }
     }
 
@@ -148,10 +158,10 @@ class AuthService
     {
         if ($data['registered_by'] === 'email') {
             $user = User::where('email', $data['email'])->firstOrFail();
-            $this->OTPService->sendEmailOtp($user);
+            $this->sendEmailOtp($user);
         } else {
             $user = User::where('phone', $data['phone'])->firstOrFail();
-            $this->OTPService->sendSmsOtp();
+            $this->sendSmsOtp($user);
         }
     }
 
@@ -194,5 +204,29 @@ class AuthService
 
         $user->update(['password' => $data['password']]);
         return true;
+    }
+
+    // -------------------------------------------------------------------------
+    // OTP helpers
+    // -------------------------------------------------------------------------
+
+    /**
+     * Generate an OTP and send it to the user's email.
+     */
+    private function sendEmailOtp(User $user): void
+    {
+        $result = (new Otp())->generate($user->email, 'numeric', 4, 3);
+
+        Mail::to($user->email)->send(new EmailVerificationOTP($result->token));
+    }
+
+    /**
+     * Generate an OTP for the user's phone number.
+     */
+    private function sendSmsOtp(User $user): void
+    {
+        $result = (new Otp())->generate($user->phone, 'numeric', 4, 3);
+
+        // TODO: integrate SMS provider and deliver the token to $user->phone
     }
 }
